@@ -7,7 +7,7 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2021, Cypress Semiconductor Corporation (an Infineon company)
+# Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company)
 # SPDX-License-Identifier: Apache-2.0
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -104,13 +104,14 @@ INCLUDES+=libs/trusted-firmware-m/COMPONENT_TFM_NS_INTERFACE/include
 endif
 
 # Custom configuration of mbedtls library.
-MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"mbedtls_user_config.h"'
+MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"configs/mbedtls_user_config.h"'
 
 # Add additional defines to the build process (without a leading -D).
-DEFINES=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RTOS_AWARE
+DEFINES=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RTOS_AWARE CY_RETARGET_IO_CONVERT_LF_TO_CRLF
 
 ifeq ($(TARGET), CY8CKIT-064S0S2-4343W)
 DEFINES += CY_TFM_PSA_SUPPORTED CY_SECURE_SOCKETS_PKCS_SUPPORT
+CY_SECURE_POLICY_NAME = policy_multi_CM0_CM4_tfm_dev_certs
 endif
 
 # CY8CPROTO-062-4343W board shares the same GPIO for the user button (USER BTN1)
@@ -127,10 +128,10 @@ DEFINES += HTTP_USER_AGENT_VALUE="\"anycloud-http-client\""
 DEFINES += MQTT_DO_NOT_USE_CUSTOM_CONFIG
 DEFINES += HTTP_DO_NOT_USE_CUSTOM_CONFIG
 
-# To disable the main.c for enabling the compilation of mqtt_iot_sas_token_provision.c 
+#  To disable the main.c for enabling the compilation of mqtt_iot_sas_token_provision.c
 #CY_IGNORE += ./source/main.c
 
-# To disable the mqtt_iot_sas_token_provision.c for enabling the compilation of main.c 
+# To disable the mqtt_iot_sas_token_provision.c for enabling the compilation of main.c
 CY_IGNORE += ./source/mqtt_iot_sas_token_provision.c
 
 # Select softfp or hardfp floating point. Default is softfp.

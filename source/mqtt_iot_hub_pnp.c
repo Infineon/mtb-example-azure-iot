@@ -1,41 +1,41 @@
 /******************************************************************************
-* File Name: mqtt_iot_hub_pnp.c
-*
-* Description: This file contains tasks and functions related to Azure Plug and
-* Play feature task.
-*
-********************************************************************************
-* Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
-* an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
-*
-* This software, including source code, documentation and related
-* materials ("Software") is owned by Cypress Semiconductor Corporation
-* or one of its affiliates ("Cypress") and is protected by and subject to
-* worldwide patent protection (United States and foreign),
-* United States copyright laws and international treaty provisions.
-* Therefore, you may use this Software only as provided in the license
-* agreement accompanying the software package from which you
-* obtained this Software ("EULA").
-* If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
-* non-transferable license to copy, modify, and compile the Software
-* source code solely for use in connection with Cypress's
-* integrated circuit products.  Any reproduction, modification, translation,
-* compilation, or representation of this Software except as specified
-* above is prohibited without the express written permission of Cypress.
-*
-* Disclaimer: THIS SOFTWARE IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND,
-* EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, NONINFRINGEMENT, IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. Cypress
-* reserves the right to make changes to the Software without notice. Cypress
-* does not assume any liability arising out of the application or use of the
-* Software or any product or circuit described in the Software. Cypress does
-* not authorize its products for use in any products where a malfunction or
-* failure of the Cypress product may reasonably be expected to result in
-* significant property damage, injury or death ("High Risk Product"). By
-* including Cypress's product in a High Risk Product, the manufacturer
-* of such system or application assumes all risk of such use and in doing
-* so agrees to indemnify Cypress against all liability.
-*******************************************************************************/
+ * File Name: mqtt_iot_hub_pnp.c
+ *
+ * Description: This file contains tasks and functions related to Azure Plug and
+ * Play feature task.
+ *
+ ********************************************************************************
+ * Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company) or
+ * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
+ *
+ * This software, including source code, documentation and related
+ * materials ("Software") is owned by Cypress Semiconductor Corporation
+ * or one of its affiliates ("Cypress") and is protected by and subject to
+ * worldwide patent protection (United States and foreign),
+ * United States copyright laws and international treaty provisions.
+ * Therefore, you may use this Software only as provided in the license
+ * agreement accompanying the software package from which you
+ * obtained this Software ("EULA").
+ * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
+ * non-transferable license to copy, modify, and compile the Software
+ * source code solely for use in connection with Cypress's
+ * integrated circuit products.  Any reproduction, modification, translation,
+ * compilation, or representation of this Software except as specified
+ * above is prohibited without the express written permission of Cypress.
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, NONINFRINGEMENT, IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. Cypress
+ * reserves the right to make changes to the Software without notice. Cypress
+ * does not assume any liability arising out of the application or use of the
+ * Software or any product or circuit described in the Software. Cypress does
+ * not authorize its products for use in any products where a malfunction or
+ * failure of the Cypress product may reasonably be expected to result in
+ * significant property damage, injury or death ("High Risk Product"). By
+ * including Cypress's product in a High Risk Product, the manufacturer
+ * of such system or application assumes all risk of such use and in doing
+ * so agrees to indemnify Cypress against all liability.
+ *******************************************************************************/
 
 #include "azure_common.h"
 
@@ -62,7 +62,6 @@
 #include "mqtt_iot_common.h"
 
 #ifdef CY_TFM_PSA_SUPPORTED
-#include "cy_wdt.h"
 #include "tfm_multi_core_api.h"
 #include "tfm_ns_interface.h"
 #include "tfm_ns_mailbox.h"
@@ -70,14 +69,14 @@
 #endif
 
 /*******************************************************************************
-* Macros
-********************************************************************************/
+ * Macros
+ ********************************************************************************/
 #define DEFAULT_START_TEMP_COUNT                    (1)
 #define DEFAULT_START_TEMP_CELSIUS                  (22.0)
 #define DOUBLE_DECIMAL_PLACE_DIGITS                 (2)
 
 /* Wait duration between messages, should be in multiples of 500 */
-#define MESSAGE_WAIT_LOOP_DURATION_MSEC             (600 * 1000)
+#define MESSAGE_WAIT_LOOP_DURATION_MSEC             (500 * 500)
 
 #define SAS_KEY_DURATION_MINUTES                    (240)
 
@@ -92,6 +91,9 @@
 
 #define GET_QUEUE_TIMEOUT_MSEC                      (500)
 
+#define PNP_APP_TIMEOUT_MSEC                        (500)
+
+#define PNP_MSG_EVENT_QUEUE_MSEC                    (500)
 /************************************************************
  * Static Variables
  ************************************************************/
@@ -111,8 +113,8 @@ static char                                sas_token_buffer[IOT_SAMPLE_APP_BUFFE
 #endif
 
 /***********************************************************
-* Constants
-************************************************************/
+ * Constants
+ ************************************************************/
 /* IoT Hub Device Twin Values */
 static az_span const twin_desired_name = AZ_SPAN_LITERAL_FROM_STR("desired");
 static az_span const twin_version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
@@ -138,8 +140,8 @@ static az_span const command_empty_response_payload = AZ_SPAN_LITERAL_FROM_STR("
 static char const iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z";
 
 /*******************************************************************************
-* Global Variables
-********************************************************************************/
+ * Global Variables
+ ********************************************************************************/
 /* IoT Hub Method (Command) Buffers */
 static char command_start_time_value_buffer[COMMAND_START_TIME_VALUE_BUFFER_SIZE];
 static char command_end_time_value_buffer[COMMAND_END_TIME_VALUE_BUFFER_SIZE];
@@ -174,11 +176,27 @@ typedef struct pnp_msg_event
 /* The network buffer must remain valid for the lifetime of the MQTT context. */
 static uint8_t                             *buffer = NULL;
 
+/******************************************************************************
+ * Function Name: get_request_id
+ ******************************************************************************
+ * Summary:
+ *  Function to get request ID, used during send/receive operations for device
+ *  twin property.
+ *
+ * Parameters:
+ *  void
+ *
+ * Return:
+ *  az_span: Represents a "view" over a byte buffer that represents a contiguous
+ *  region of memory. It contains a pointer to the start of the byte buffer and
+ *  the buffer's size.
+ *
+ ******************************************************************************/
 static az_span get_request_id(void)
 {
     az_span remainder;
     az_span out_span = az_span_create(
-        (uint8_t*)connection_request_id_buffer, sizeof(connection_request_id_buffer));
+            (uint8_t*)connection_request_id_buffer, sizeof(connection_request_id_buffer));
 
     az_result rc = az_span_u32toa(out_span, connection_request_id_int++, &remainder);
     if (az_result_failed(rc))
@@ -189,10 +207,28 @@ static az_span get_request_id(void)
     return az_span_slice(out_span, 0, az_span_size(out_span) - az_span_size(remainder));
 }
 
+/******************************************************************************
+ * Function Name: send_command_response
+ ******************************************************************************
+ * Summary:
+ *  Send methods response to Azure hub.
+ *
+ * Parameters:
+ *  command_request: A method request received from IoT Hub.
+ *
+ *  status: Azure IoT service status codes.
+ *
+ *  response: Represents a "view" over a byte buffer that represents a contiguous
+ *  region of memory. It contains a pointer to the start of the byte buffer and the
+ *  buffer's size.
+ *
+ * Return:
+ *  void
+ ******************************************************************************/
 static void send_command_response(
-    az_iot_hub_client_method_request const* command_request,
-    az_iot_status status,
-    az_span response)
+        az_iot_hub_client_method_request const* command_request,
+        az_iot_status status,
+        az_span response)
 {
     az_result rc;
     cy_rslt_t result = CY_RSLT_SUCCESS;
@@ -202,16 +238,16 @@ static void send_command_response(
     /* Get the Methods response topic to publish the command response. */
     char methods_response_topic_buffer[METHODS_RESPONSE_TOPIC_BUFFER_SIZE];
     rc = az_iot_hub_client_methods_response_get_publish_topic(
-      &hub_client,
-      command_request->request_id,
-      (uint16_t)status,
-      methods_response_topic_buffer,
-      sizeof(methods_response_topic_buffer),
-      &topic_len);
+            &hub_client,
+            command_request->request_id,
+            (uint16_t)status,
+            methods_response_topic_buffer,
+            sizeof(methods_response_topic_buffer),
+            &topic_len);
     if (az_result_failed(rc))
     {
         IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the Methods Response topic: az_result return code 0x%08x.", (unsigned int)rc);
+                "Failed to get the Methods Response topic: az_result return code 0x%08x.", (unsigned int)rc);
         return;
     }
 
@@ -239,13 +275,36 @@ static void send_command_response(
     }
 }
 
+/******************************************************************************
+ * Function Name: build_property_payload
+ ******************************************************************************
+ * Summary:
+ *  Function to build JSON format of properties for method feature response.
+ *
+ * Parameters:
+ *  property_count: Number of properties to be reported.
+ *
+ *  names: Names of properties to be reported.
+ *
+ *  values: Values of properties to be reported.
+ *
+ *  times: Start and end time duration.
+ *
+ *  property_payload: Response message payload.
+ *
+ *  out_property_payload: Response message payload.
+ *
+ * Return:
+ *  void
+ *
+ ******************************************************************************/
 static void build_property_payload(
-    uint8_t property_count,
-    az_span const names[],
-    double const values[],
-    az_span const times[],
-    az_span property_payload,
-    az_span* out_property_payload)
+        uint8_t property_count,
+        az_span const names[],
+        double const values[],
+        az_span const times[],
+        az_span property_payload,
+        az_span* out_property_payload)
 {
     az_json_writer jw;
     az_result rc;
@@ -315,6 +374,23 @@ static void build_property_payload(
     *out_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 }
 
+/******************************************************************************
+ * Function Name: invoke_getMaxMinReport
+ ******************************************************************************
+ * Summary:
+ *  Function to build method response payload for command invoked by Azure Hub.
+ *
+ * Parameters:
+ *  payload: Payload of message received from Azure hub method invocation.
+ *
+ *  response: Response message payload.
+ *
+ *  out_response: Response message payload.
+ *
+ * Return:
+ *  bool
+ *
+ ******************************************************************************/
 static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response)
 {
     int32_t incoming_since_value_len = 0;
@@ -335,10 +411,10 @@ static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* o
         return false;
     }
     rc = az_json_token_get_string(
-          &jr.token,
-          command_start_time_value_buffer,
-          sizeof(command_start_time_value_buffer),
-          &incoming_since_value_len);
+            &jr.token,
+            command_start_time_value_buffer,
+            sizeof(command_start_time_value_buffer),
+            &incoming_since_value_len);
     if (az_result_failed(rc))
     {
         IOT_SAMPLE_LOG_ERROR("Failed az_json_token_get_string: az_result return code 0x%08x.", (unsigned int)rc);
@@ -353,7 +429,7 @@ static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* o
     }
 
     az_span start_time_span
-      = az_span_create((uint8_t*)command_start_time_value_buffer, incoming_since_value_len);
+    = az_span_create((uint8_t*)command_start_time_value_buffer, incoming_since_value_len);
 
     IOT_SAMPLE_LOG_AZ_SPAN("Start time:", start_time_span);
 
@@ -363,10 +439,10 @@ static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* o
     time(&rawtime);
     timeinfo = localtime(&rawtime);
     size_t length = strftime(
-      command_end_time_value_buffer,
-      sizeof(command_end_time_value_buffer),
-      iso_spec_time_format,
-      timeinfo);
+            command_end_time_value_buffer,
+            sizeof(command_end_time_value_buffer),
+            iso_spec_time_format,
+            timeinfo);
     az_span end_time_span = az_span_create((uint8_t*)command_end_time_value_buffer, (int32_t)length);
 
     IOT_SAMPLE_LOG_AZ_SPAN("End Time:", end_time_span);
@@ -382,8 +458,23 @@ static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* o
     return true;
 }
 
+/******************************************************************************
+ * Function Name: handle_command_request
+ ******************************************************************************
+ * Summary:
+ *  Handle for Azure hub method invocation.
+ *
+ * Parameters:
+ *  message: MQTT publish/receive information structure.
+ *
+ *  command_request: A method request received from IoT Hub.
+ *
+ * Return:
+ *  void
+ *
+ ******************************************************************************/
 static void handle_command_request(cy_mqtt_publish_info_t *message,
-                                    az_iot_hub_client_method_request * command_request)
+        az_iot_hub_client_method_request * command_request)
 {
     cy_rslt_t result = CY_RSLT_SUCCESS;
     az_span message_span = az_span_create((uint8_t*)message->payload, message->payload_len);
@@ -415,17 +506,17 @@ static void handle_command_request(cy_mqtt_publish_info_t *message,
         msg_event->method_req = command_request;
         msg_event->status = status;
         memcpy(&(msg_event->command_response_payload), &command_response_payload, sizeof(az_span));
-     }
+    }
     else
     {
         IOT_SAMPLE_LOG_AZ_SPAN("Command not supported:", command_request->name);
         msg_event->method_req = command_request;
         msg_event->status = AZ_IOT_STATUS_NOT_FOUND;
         memcpy(&(msg_event->command_response_payload), &command_empty_response_payload, sizeof(az_span));
-     }
+    }
 
     TEST_INFO(("\r\nPushing to PNP message(device_command_request) event queue...\n"));
-    result = cy_rtos_put_queue(&pnp_msg_event_queue, (void *)&msg_event, 500, false);
+    result = cy_rtos_put_queue(&pnp_msg_event_queue, (void *)&msg_event, PNP_MSG_EVENT_QUEUE_MSEC, false);
     if(result != CY_RSLT_SUCCESS)
     {
         TEST_INFO(("\r\nPushing to PNP message event queue failed with Error : [0x%X] ", (unsigned int)result));
@@ -435,14 +526,39 @@ static void handle_command_request(cy_mqtt_publish_info_t *message,
     TEST_INFO(("\r\nMessage(device_command_request) queued to PNP message event queue...\n"));
 }
 
+/******************************************************************************
+ * Function Name: build_property_payload_with_status
+ ******************************************************************************
+ * Summary:
+ *  Function to build JSON format of properties for twin feature response.
+ *
+ * Parameters:
+ *  name: Names of properties to be reported.
+ *
+ *  value: Values of properties to be reported.
+ *
+ *  ack_code_value: Value of acknowledgment code.
+ *
+ *  ack_version_value: Value of acknowledgment version.
+ *
+ *  ack_description_value: Acknowledgment message value.
+ *
+ *  property_payload: Message payload for property to be reported.
+ *
+ *  out_property_payload: Message payload for property to be reported.
+ *
+ * Return:
+ *  void
+ *
+ ******************************************************************************/
 static void build_property_payload_with_status(
-    az_span name,
-    double value,
-    int32_t ack_code_value,
-    int32_t ack_version_value,
-    az_span ack_description_value,
-    az_span property_payload,
-    az_span* out_property_payload)
+        az_span name,
+        double value,
+        int32_t ack_code_value,
+        int32_t ack_version_value,
+        az_span ack_description_value,
+        az_span property_payload,
+        az_span* out_property_payload)
 {
     az_json_writer jw;
     az_result rc;
@@ -536,6 +652,25 @@ static void build_property_payload_with_status(
     *out_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 }
 
+/******************************************************************************
+ * Function Name: send_reported_property
+ ******************************************************************************
+ * Summary:
+ *  Function to get device twin topic and report updated property to Azure.
+ *
+ * Parameters:
+ *  name: Name of the device twin property to be sent.
+ *
+ *  value: Value of the device twin property to be sent.
+ *
+ *  version: Device twin version.
+ *
+ *  confirm
+ *
+ * Return:
+ *  void
+ *
+ ******************************************************************************/
 static void send_reported_property(az_span name, double value, int32_t version, bool confirm)
 {
     az_result rc;
@@ -546,11 +681,11 @@ static void send_reported_property(az_span name, double value, int32_t version, 
     /* Get the Twin Patch topic to send a reported property update. */
     char twin_patch_topic_buffer[128];
     rc = az_iot_hub_client_twin_patch_get_publish_topic(
-         &hub_client,
-         get_request_id(),
-         twin_patch_topic_buffer,
-         sizeof(twin_patch_topic_buffer),
-         &topic_len);
+            &hub_client,
+            get_request_id(),
+            twin_patch_topic_buffer,
+            sizeof(twin_patch_topic_buffer),
+            &topic_len);
     if (az_result_failed(rc))
     {
         IOT_SAMPLE_LOG_ERROR("Failed to get the Twin Patch topic: az_result return code 0x%08x.", (unsigned int)rc);
@@ -564,13 +699,13 @@ static void send_reported_property(az_span name, double value, int32_t version, 
     if (confirm)
     {
         build_property_payload_with_status(
-        name,
-        value,
-        AZ_IOT_STATUS_OK,
-        version,
-        twin_success_name,
-        reported_property_payload,
-        &reported_property_payload);
+                name,
+                value,
+                AZ_IOT_STATUS_OK,
+                version,
+                twin_success_name,
+                reported_property_payload,
+                &reported_property_payload);
     }
     else
     {
@@ -605,6 +740,22 @@ static void send_reported_property(az_span name, double value, int32_t version, 
     }
 }
 
+/******************************************************************************
+ * Function Name: update_device_temperature_property
+ ******************************************************************************
+ * Summary:
+ *  Function to update device temperature property based on device twin message
+ *  from Azure Hub.
+ *
+ * Parameters:
+ *  temperature: Value of temperature property.
+ *
+ *  out_is_max_temp_changed: Flag for temperature change limit.
+ *
+ * Return:
+ *  void
+ *
+ ******************************************************************************/
 static void update_device_temperature_property(double temperature, bool* out_is_max_temp_changed)
 {
     if (device_maximum_temperature < device_minimum_temperature)
@@ -639,11 +790,31 @@ static void update_device_temperature_property(double temperature, bool* out_is_
     IOT_SAMPLE_LOG("Average Temperature: %2f", device_average_temperature);
 }
 
+/******************************************************************************
+ * Function Name: parse_desired_temperature_property
+ ******************************************************************************
+ * Summary:
+ *  Function to process desired temperature property from the device twin
+ *  message received from the Azure Hub.
+ *
+ * Parameters:
+ *  message_span: Structure to hold the received message.
+ *
+ *  is_twin_get: Flag for message event.
+ *
+ *  out_parsed_temperature: Stores temperature value locally.
+ *
+ *  out_parsed_version_number: Stores device twin version number.
+ *
+ * Return:
+ *  bool
+ *
+ ******************************************************************************/
 static bool parse_desired_temperature_property(
-    az_span message_span,
-    bool is_twin_get,
-    double* out_parsed_temperature,
-    int32_t* out_parsed_version_number)
+        az_span message_span,
+        bool is_twin_get,
+        double* out_parsed_temperature,
+        int32_t* out_parsed_version_number)
 {
     az_span property = twin_desired_temperature_property_name;
 
@@ -669,9 +840,9 @@ static bool parse_desired_temperature_property(
     if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
         IOT_SAMPLE_LOG(
-        "`%.*s` property object not found in device twin GET response.",
-        (int)az_span_size(twin_desired_name),
-        az_span_ptr(twin_desired_name));
+                "`%.*s` property object not found in device twin GET response.",
+                (int)az_span_size(twin_desired_name),
+                az_span_ptr(twin_desired_name));
         return false;
     }
 
@@ -718,9 +889,9 @@ static bool parse_desired_temperature_property(
         if (!desired_found)
         {
             IOT_SAMPLE_LOG(
-            "`%.*s` property object not found in device twin GET response.",
-            (int)az_span_size(twin_desired_name),
-            az_span_ptr(twin_desired_name));
+                    "`%.*s` property object not found in device twin GET response.",
+                    (int)az_span_size(twin_desired_name),
+                    az_span_ptr(twin_desired_name));
             return false;
         }
     }
@@ -786,30 +957,45 @@ static bool parse_desired_temperature_property(
     if (temp_found && version_found)
     {
         IOT_SAMPLE_LOG(
-        "Parsed desired `%.*s`: %2f",
-        (int)az_span_size(property),
-        az_span_ptr(property),
-        *out_parsed_temperature);
+                "Parsed desired `%.*s`: %2f",
+                (int)az_span_size(property),
+                az_span_ptr(property),
+                *out_parsed_temperature);
         IOT_SAMPLE_LOG(
-        "Parsed `%.*s` number: %d",
-        (int)az_span_size(twin_version_name),
-        az_span_ptr(twin_version_name),
-        (int)*out_parsed_version_number);
+                "Parsed `%.*s` number: %d",
+                (int)az_span_size(twin_version_name),
+                az_span_ptr(twin_version_name),
+                (int)*out_parsed_version_number);
     }
     else
     {
         IOT_SAMPLE_LOG(
-        "Either `%.*s` or `%.*s` were not found in desired property response.",
-        (int)az_span_size(property),
-        az_span_ptr(property),
-        (int)az_span_size(twin_version_name),
-        az_span_ptr(twin_version_name));
+                "Either `%.*s` or `%.*s` were not found in desired property response.",
+                (int)az_span_size(property),
+                az_span_ptr(property),
+                (int)az_span_size(twin_version_name),
+                az_span_ptr(twin_version_name));
         return false;
     }
 
     return true;
 }
 
+/******************************************************************************
+ * Function Name: process_device_twin_message
+ ******************************************************************************
+ * Summary:
+ *  Function to process the device twin message received from the Azure Hub.
+ *
+ * Parameters:
+ *  message_span: Structure to hold the received message.
+ *
+ *  is_twin_get: Flag for message event.
+ *
+ * Return:
+ *  void
+ *
+ ******************************************************************************/
 static void process_device_twin_message(az_span message_span, bool is_twin_get)
 {
     double desired_temperature;
@@ -817,7 +1003,7 @@ static void process_device_twin_message(az_span message_span, bool is_twin_get)
 
     /* Parse for the desired temperature property. */
     if (parse_desired_temperature_property(
-          message_span, is_twin_get, &desired_temperature, &version_number))
+            message_span, is_twin_get, &desired_temperature, &version_number))
     {
         IOT_SAMPLE_LOG(" "); /* Formatting */
         bool confirm = true;
@@ -833,8 +1019,23 @@ static void process_device_twin_message(az_span message_span, bool is_twin_get)
     }
 }
 
+/******************************************************************************
+ * Function Name: handle_device_twin_message
+ ******************************************************************************
+ * Summary:
+ *  Handle for Device Twin type message.
+ *
+ * Parameters:
+ *  message: MQTT publish information structure.
+ *
+ *  twin_response: Structure for Twin response.
+ *
+ * Return:
+ *  void
+ *
+ ******************************************************************************/
 static void handle_device_twin_message(cy_mqtt_publish_info_t *message,
-                                        az_iot_hub_client_twin_response *twin_response)
+        az_iot_hub_client_twin_response *twin_response)
 {
     cy_rslt_t result = CY_RSLT_SUCCESS;
     az_span message_span = az_span_create((uint8_t*)message->payload, message->payload_len);
@@ -851,29 +1052,29 @@ static void handle_device_twin_message(cy_mqtt_publish_info_t *message,
     /* Invoke appropriate action per response type (3 types only). */
     switch(twin_response->response_type)
     {
-      case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET:
-           IOT_SAMPLE_LOG("Message Type: GET");
-           memcpy(&(msg_event->message_span), &message_span, sizeof(az_span));
-           msg_event->is_twin_get = true;
-           break;
+    case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET:
+        IOT_SAMPLE_LOG("Message Type: GET");
+        memcpy(&(msg_event->message_span), &message_span, sizeof(az_span));
+        msg_event->is_twin_get = true;
+        break;
 
-      case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
-           IOT_SAMPLE_LOG("Message Type: Reported Properties");
-           free(msg_event);
-           msg_event = NULL;
-           break;
+    case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
+        IOT_SAMPLE_LOG("Message Type: Reported Properties");
+        free(msg_event);
+        msg_event = NULL;
+        break;
 
-      case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
-           IOT_SAMPLE_LOG("Message Type: Desired Properties");
-           memcpy(&(msg_event->message_span), &message_span, sizeof(az_span));
-           msg_event->is_twin_get = false;
-           break;
+    case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
+        IOT_SAMPLE_LOG("Message Type: Desired Properties");
+        memcpy(&(msg_event->message_span), &message_span, sizeof(az_span));
+        msg_event->is_twin_get = false;
+        break;
     }
 
     if(msg_event != NULL)
     {
         TEST_INFO(("\r\nPushing to PNP message(device_twin_message) event queue...\n"));
-        result = cy_rtos_put_queue(&pnp_msg_event_queue, (void *)&msg_event, 500, false);
+        result = cy_rtos_put_queue(&pnp_msg_event_queue, (void *)&msg_event, PNP_MSG_EVENT_QUEUE_MSEC, false);
         if(result != CY_RSLT_SUCCESS)
         {
             TEST_INFO(("\r\nPushing to PNP message event queue failed with Error : [0x%X] ", (unsigned int)result));
@@ -884,6 +1085,24 @@ static void handle_device_twin_message(cy_mqtt_publish_info_t *message,
     }
 }
 
+/******************************************************************************
+ * Function Name: on_message_received
+ ******************************************************************************
+ * Summary:
+ *  Function to handle the method invocation or device twin message from the
+ *  Azure Hub.
+ *
+ * Parameters:
+ *  topic: Topic of the received message.
+ *
+ *  topic_len: Topic length of the received message.
+ *
+ *  message: MQTT publish/subscribe information structure.
+ *
+ * Return:
+ *  void
+ *
+ ******************************************************************************/
 static void on_message_received(char* topic, uint16_t topic_len, cy_mqtt_publish_info_t *message)
 {
     az_result rc;
@@ -922,6 +1141,23 @@ static void on_message_received(char* topic, uint16_t topic_len, cy_mqtt_publish
     }
 }
 
+/******************************************************************************
+ * Function Name: mqtt_event_cb
+ ******************************************************************************
+ * Summary:
+ *  Callback for MQTT type events.
+ *
+ * Parameters:
+ *  mqtt_handle: Handle to MQTT instance.
+ *
+ *  event: MQTT event information structure.
+ *
+ *  arg:
+ *
+ * Return:
+ *  void
+ *
+ ******************************************************************************/
 static void mqtt_event_cb(cy_mqtt_t mqtt_handle, cy_mqtt_event_t event, void *arg)
 {
     cy_mqtt_publish_info_t *received_msg;
@@ -930,30 +1166,43 @@ static void mqtt_event_cb(cy_mqtt_t mqtt_handle, cy_mqtt_event_t event, void *ar
 
     switch(event.type)
     {
-        case CY_MQTT_EVENT_TYPE_DISCONNECT :
-            if(event.data.reason == CY_MQTT_DISCONN_TYPE_BROKER_DOWN)
-            {
-                TEST_INFO(("\r\nCY_MQTT_DISCONN_TYPE_BROKER_DOWN .....\n"));
-            }
-            else
-            {
-                TEST_INFO(("\r\nCY_MQTT_DISCONN_REASON_NETWORK_DISCONNECTION .....\n"));
-            }
-            connect_state = false;
-            break;
+    case CY_MQTT_EVENT_TYPE_DISCONNECT :
+        if(event.data.reason == CY_MQTT_DISCONN_TYPE_BROKER_DOWN)
+        {
+            TEST_INFO(("\r\nCY_MQTT_DISCONN_TYPE_BROKER_DOWN .....\n"));
+        }
+        else
+        {
+            TEST_INFO(("\r\nCY_MQTT_DISCONN_REASON_NETWORK_DISCONNECTION .....\n"));
+        }
+        connect_state = false;
+        break;
 
-        case CY_MQTT_EVENT_TYPE_PUBLISH_RECEIVE :
-            received_msg = &(event.data.pub_msg.received_message);
-            TEST_INFO(("\r\nMessage received from broker...\n"));
-            on_message_received((char*)received_msg->topic, received_msg->topic_len, received_msg);
-            break;
+    case CY_MQTT_EVENT_TYPE_PUBLISH_RECEIVE :
+        received_msg = &(event.data.pub_msg.received_message);
+        TEST_INFO(("\r\nMessage received from broker...\n"));
+        on_message_received((char*)received_msg->topic, received_msg->topic_len, received_msg);
+        break;
 
-        default :
-            TEST_INFO(("\r\nUnknown Event .....\n"));
-            break;
+    default :
+        TEST_INFO(("\r\nUnknown Event .....\n"));
+        break;
     }
 }
 
+/******************************************************************************
+ * Function Name: disconnect_and_delete_mqtt_client
+ ******************************************************************************
+ * Summary:
+ *  Function to disconnect and delete MQTT client.
+ *
+ * Parameters:
+ *  void
+ *
+ * Return:
+ *  cy_rslt_t: Provides the result of an operation as a structured bitfield.
+ *
+ ******************************************************************************/
 static cy_rslt_t disconnect_and_delete_mqtt_client(void)
 {
     cy_rslt_t result = CY_RSLT_SUCCESS;
@@ -998,6 +1247,19 @@ static cy_rslt_t disconnect_and_delete_mqtt_client(void)
     return result;
 }
 
+/******************************************************************************
+ * Function Name: request_device_twin_document
+ ******************************************************************************
+ * Summary:
+ *  Function to request device twin from the Azure hub.
+ *
+ * Parameters:
+ *  void
+ *
+ * Return:
+ *  cy_rslt_t: Provides the result of an operation as a structured bitfield.
+ *
+ ******************************************************************************/
 static cy_rslt_t request_device_twin_document(void)
 {
     int rc;
@@ -1011,15 +1273,15 @@ static cy_rslt_t request_device_twin_document(void)
     IOT_SAMPLE_LOG("Client requesting device twin document from service.");
 
     rc = az_iot_hub_client_twin_document_get_publish_topic(
-        &hub_client,
-        get_request_id(),
-        twin_document_topic_buffer,
-        sizeof(twin_document_topic_buffer),
-        (size_t *)&topic_len);
+            &hub_client,
+            get_request_id(),
+            twin_document_topic_buffer,
+            sizeof(twin_document_topic_buffer),
+            (size_t *)&topic_len);
     if (az_result_failed(rc))
     {
         IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the Twin Document topic: az_result return code 0x%08x.", rc);
+                "Failed to get the Twin Document topic: az_result return code 0x%08x.", rc);
         exit(rc);
     }
     pub_msg.qos = (cy_mqtt_qos_t)CY_MQTT_QOS0;
@@ -1042,6 +1304,19 @@ static cy_rslt_t request_device_twin_document(void)
     return result;
 }
 
+/******************************************************************************
+ * Function Name: subscribe_mqtt_client_to_iot_hub_topics
+ ******************************************************************************
+ * Summary:
+ *  Function to subscribe to methods and Twin topic.
+ *
+ * Parameters:
+ *  void
+ *
+ * Return:
+ *  cy_rslt_t: Provides the result of an operation as a structured bitfield
+ *
+ ******************************************************************************/
 static cy_rslt_t subscribe_mqtt_client_to_iot_hub_topics(void)
 {
     cy_rslt_t result = CY_RSLT_SUCCESS;
@@ -1094,6 +1369,19 @@ static cy_rslt_t subscribe_mqtt_client_to_iot_hub_topics(void)
     return result;
 }
 
+/******************************************************************************
+ * Function Name: connect_mqtt_client_to_iot_hub
+ ******************************************************************************
+ * Summary:
+ *  Function to establish MQTT connection to Azure IoT hub.
+ *
+ * Parameters:
+ *  void
+ *
+ * Return:
+ *  cy_rslt_t: Provides the result of an operation as a structured bitfield.
+ *
+ ******************************************************************************/
 static cy_rslt_t connect_mqtt_client_to_iot_hub(void)
 {
     cy_rslt_t result = CY_RSLT_SUCCESS;
@@ -1116,7 +1404,7 @@ static cy_rslt_t connect_mqtt_client_to_iot_hub(void)
 
     /* Get the MQTT client user name */
     rc = az_iot_hub_client_get_user_name(&hub_client, mqtt_client_username_buffer,
-                                          sizeof(mqtt_client_username_buffer), &username_len);
+            sizeof(mqtt_client_username_buffer), &username_len);
     if(az_result_failed(rc))
     {
         TEST_INFO(("\r\nFailed to get MQTT client username: az_result return code 0x%08x.", rc));
@@ -1152,9 +1440,23 @@ static cy_rslt_t connect_mqtt_client_to_iot_hub(void)
         return TEST_FAIL;
     }
     connect_state = true;
-  return CY_RSLT_SUCCESS;
+    return CY_RSLT_SUCCESS;
 }
 
+/******************************************************************************
+ * Function Name: create_and_configure_mqtt_client
+ ******************************************************************************
+ * Summary:
+ *  Function to configure MQTT client's credentials and hostname for connection
+ *  with Azure Hub.
+ *
+ * Parameters:
+ *  void
+ *
+ * Return:
+ *  cy_rslt_t: Provides the result of an operation as a structured bitfield.
+ *
+ ******************************************************************************/
 static cy_rslt_t create_and_configure_mqtt_client(void)
 {
     int32_t rc;
@@ -1167,8 +1469,8 @@ static cy_rslt_t create_and_configure_mqtt_client(void)
     memset(&mqtt_endpoint_buffer, 0x00, sizeof(mqtt_endpoint_buffer));
 
     ep_size = iot_sample_create_mqtt_endpoint(CY_MQTT_IOT_HUB, &env_vars,
-                                                 mqtt_endpoint_buffer,
-                                                 sizeof(mqtt_endpoint_buffer));
+            mqtt_endpoint_buffer,
+            sizeof(mqtt_endpoint_buffer));
 
     /* Initialize the hub client with the default connection options */
     rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL);
@@ -1227,9 +1529,9 @@ static cy_rslt_t create_and_configure_mqtt_client(void)
     security = &credentials;
 
     result = cy_mqtt_create(buffer, NETWORK_BUFFER_SIZE,
-                             security, &broker_info,
-                             (cy_mqtt_callback_t)mqtt_event_cb, NULL,
-                             &mqtthandle);
+            security, &broker_info,
+            (cy_mqtt_callback_t)mqtt_event_cb, NULL,
+            &mqtthandle);
     if(result == TEST_PASS)
     {
         TEST_INFO(("\r\ncy_mqtt_create ----------------------------- Pass \n"));
@@ -1243,6 +1545,19 @@ static cy_rslt_t create_and_configure_mqtt_client(void)
     return CY_RSLT_SUCCESS;
 }
 
+/******************************************************************************
+ * Function Name: configure_hub_environment_variables
+ ******************************************************************************
+ * Summary:
+ *  Configure MQTT hub environment variables like device ID and hostname endpoint.
+ *
+ * Parameters:
+ *  void
+ *
+ * Return:
+ *  cy_rslt_t: Provides the result of an operation as a structured bitfield.
+ *
+ ******************************************************************************/
 static cy_rslt_t configure_hub_environment_variables(void)
 {
     cy_rslt_t result = TEST_PASS;
@@ -1263,6 +1578,20 @@ static cy_rslt_t configure_hub_environment_variables(void)
     return result;
 }
 
+/******************************************************************************
+ * Function Name: Azure_Device_Demo_app
+ ******************************************************************************
+ * Summary:
+ *  Task to establish connection to Azure IoT hub and demonstrate it's
+ *  Plug and Play feature.
+ *
+ * Parameters:
+ *  arg
+ *
+ * Return:
+ *  void
+ *
+ ******************************************************************************/
 void Azure_hub_pnp_app(void *arg)
 {
     cy_rslt_t TestRes = TEST_PASS ;
@@ -1401,7 +1730,7 @@ void Azure_hub_pnp_app(void *arg)
         Failcount++;
     }
 
-    /* 10 Min check to make the app to work with CI/CD */
+    /* Delay Loop for Azure hub pnp app task */
     time_ms = ( MESSAGE_WAIT_LOOP_DURATION_MSEC );
     while((connect_state) && (time_ms > 0))
     {
@@ -1431,8 +1760,14 @@ void Azure_hub_pnp_app(void *arg)
                 msg_event = NULL;
             }
         }
-        time_ms = time_ms - 500;
+        time_ms = time_ms - PNP_APP_TIMEOUT_MSEC;
     }
+
+    exit :
+
+    printf("################################\n"
+            "PnP (Plug and Play demo Ends\n"
+            "################################\n");
 
     TestRes = disconnect_and_delete_mqtt_client();
     if(TestRes == TEST_PASS)
@@ -1446,7 +1781,6 @@ void Azure_hub_pnp_app(void *arg)
         Failcount++;
     }
 
-exit :
     TEST_INFO(("\r\nCompleted MQTT Client Test Cases --------------------------\n"));
     TEST_INFO(("\r\nTotal Test Cases   ---------------------- %d\n", (Failcount + Passcount)));
     TEST_INFO(("\r\nTest Cases passed  ---------------------- %d\n", Passcount));
