@@ -1,5 +1,5 @@
 /******************************************************************************
- * File Name: mqtt_iot_hub_provisioniong.c
+ * File Name: mqtt_iot_provisioniong.c
  *
  * Description: This file contains tasks and functions related to Azure
  * Provisioning feature task.
@@ -85,6 +85,10 @@
 #define GET_QUEUE_TIMEOUT_MSEC                      (500)
 
 #define DPS_APP_TIMEOUT_MSEC                        (500)
+
+#define DPS_OPERATION_EVENT_QUEUE_MSEC              (500)
+
+#define DPS_OPERATION_QUERY_EVENT_QUEUE_LENGTH      (10)
 
 /***********************************************************
  * Static Variables
@@ -201,11 +205,10 @@ static cy_rslt_t handle_device_registration_status_message(az_iot_provisioning_c
     {
         IOT_SAMPLE_LOG( "Operation is still pending." );
 
-        TEST_INFO(( "\n\rPushing to dps operation query queue...." ));
-        result = cy_rtos_put_queue( &dps_operation_query_event_queue, (void *)&register_response, 500, false );
-        if( result != CY_RSLT_SUCCESS )
+        TEST_INFO(( "Pushing to dps operation query queue....\n" ));
+        if( xQueueSend( dps_operation_query_event_queue, (void *)&register_response, pdMS_TO_TICKS(DPS_OPERATION_EVENT_QUEUE_MSEC) ) != pdPASS )
         {
-            TEST_INFO(( "\n\rPushing to dps operation query queue failed with Error : [0x%X] ", (unsigned int)result ));
+            TEST_INFO(( "Pushing to dps operation query queue failed\n"));
         }
     }
     else /* Operation is complete. */
@@ -735,15 +738,15 @@ void Azure_dps_app_task(void *arg)
 #endif
 
     /* Initialize the queue for hub method events */
-    TestRes = cy_rtos_init_queue( &dps_operation_query_event_queue, 10, sizeof(az_iot_provisioning_client_register_response *) );
-    if( TestRes == CY_RSLT_SUCCESS )
+    dps_operation_query_event_queue = xQueueCreate( DPS_OPERATION_QUERY_EVENT_QUEUE_LENGTH, sizeof( az_iot_provisioning_client_register_response *) );
+    if(dps_operation_query_event_queue != NULL)
     {
-        TEST_INFO(( "\r\ncy_rtos_init_queue ----------- Pass \n" ));
+        TEST_INFO(( "dps_operation_query_event_queue create ----------- Pass \n" ));
         Passcount++;
     }
     else
     {
-        TEST_INFO(( "\r\ncy_rtos_init_queue ----------- Fail \n" ));
+        TEST_INFO(( "dps_operation_query_event_queue create ----------- Fail \n" ));
         Failcount++;
         goto exit;
     }
@@ -865,10 +868,9 @@ void Azure_dps_app_task(void *arg)
     time_ms = ( MESSAGE_WAIT_LOOP_DURATION_MSEC );
     while( connect_state && (time_ms > 0) && (!dps_app_task_end_flag) )
     {
-        TestRes = cy_rtos_get_queue( &dps_operation_query_event_queue, (void *)&register_response, GET_QUEUE_TIMEOUT_MSEC, false );
-        if( TestRes != CY_RSLT_SUCCESS )
+        if(xQueueReceive( dps_operation_query_event_queue, (void *)&register_response, pdMS_TO_TICKS(GET_QUEUE_TIMEOUT_MSEC) ) != pdPASS)
         {
-            TEST_INFO(( "\r\ncy_rtos_get_queue returned with status [0x%X] ", (unsigned int)TestRes ));
+            TEST_INFO(( "xQueueReceive failed for pnp_msg_event_queue\n"));
         }
         else
         {

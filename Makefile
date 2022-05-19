@@ -40,7 +40,7 @@ TARGET=CY8CKIT-064S0S2-4343W
 #
 # If APPNAME is edited, ensure to update or regenerate launch
 # configurations for your IDE.
-APPNAME=mtb-example-anycloud-azure-iot
+APPNAME=mtb-example-azure-iot
 
 # Name of toolchain to use. Options include:
 #
@@ -107,7 +107,7 @@ endif
 MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"configs/mbedtls_user_config.h"'
 
 # Add additional defines to the build process (without a leading -D).
-DEFINES=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RTOS_AWARE CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+DEFINES=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RTOS_AWARE CY_RETARGET_IO_CONVERT_LF_TO_CRLF ENABLE_MQTT_LOGS
 
 ifeq ($(TARGET), CY8CKIT-064S0S2-4343W)
 DEFINES += CY_TFM_PSA_SUPPORTED CY_SECURE_SOCKETS_PKCS_SUPPORT

@@ -29,7 +29,6 @@ In this example, the [Azure C SDK port](https://github.com/Infineon/azure-c-sdk-
 - [PSoC&trade; 62S1 Wi-Fi Bluetooth&reg; pioneer kit](https://www.infineon.com/cms/en/product/evaluation-boards/cyw9p62s1-43438evb-01/) (`CYW9P62S1-43438EVB-01`)
 - [PSoC&trade; 62S1 Wi-Fi Bluetooth&reg; pioneer kit](https://www.infineon.com/cms/en/product/evaluation-boards/cyw9p62s1-43012evb-01/) (`CYW9P62S1-43012EVB-01`)
 - [PSoC&trade; 62S2 evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ceval-062s2/) (`CY8CEVAL-062S2-LAI-4373M2`,`CY8CEVAL-062S2-MUR-43439M2`)
-- [PSoC&trade; 62S3 Wi-Fi Bluetooth&reg; prototyping kit](https://www.infineon.com/cms/en/product/evaluation-boards/cy8cproto-062s3-4343w/) (`CY8CPROTO-062S3-4343W`)
 
 ## Hardware setup
 This example uses the board's default configuration. See the kit user guide to ensure that the board is configured correctly.
@@ -38,6 +37,14 @@ This example uses the board's default configuration. See the kit user guide to e
 ## Software setup
 
 Install a terminal emulator if you don't have one. Instructions in this document use [Tera Term](https://ttssh2.osdn.jp/index.html.en).
+
+Run the following command in the modus shell in the _scripts_ directory to ensure that the required modules are installed or already present ("Requirement already satisfied:" is printed).
+
+   ```
+   pip install -r requirements.txt
+   ```
+
+**Note:** The CE does not support the Cysecuretools v4.x. The Cysecuretools v3.1.0 will be used in this example, which will be downloaded as a part of pip install using "requirements.txt".
 
 This example requires the setup of Azure IoT Hub on the Microsoft Azure portal. Also, the Visual Studio Code and its Azure IoT Tool extension need to be set up with the created Azure Hub.
 
@@ -98,10 +105,10 @@ Argument | Description | Required/optional
 
 <br>
 
-The following example will clone the "[Azure IoT](https://github.com/Infineon/mtb-example-mtb-example-anycloud-azure-iot)" application with the desired name "AzureIoT" configured for the *CY8CKIT-064S0S2-4343W* BSP into the specified working directory, *C:/mtb_projects*:
+The following example will clone the "[Azure IoT](https://github.com/Infineon/mtb-example-mtb-example-azure-iot)" application with the desired name "AzureIoT" configured for the *CY8CKIT-064S0S2-4343W* BSP into the specified working directory, *C:/mtb_projects*:
 
    ```
-   project-creator-cli --board-id CY8CKIT-064S0S2-4343W --app-id mtb-example-anycloud-azure-iot --user-app-name AzureIoT --target-dir "C:/mtb_projects"
+   project-creator-cli --board-id CY8CKIT-064S0S2-4343W --app-id mtb-example-azure-iot --user-app-name AzureIoT --target-dir "C:/mtb_projects"
    ```
 
 **Note:** The project-creator-cli tool uses the `git clone` and `make getlibs` commands to fetch the repository and import the required libraries. For details, see the "Project creator tools" section of the [ModusToolbox&trade; software user guide](https://www.infineon.com/dgdl/Infineon-ModusToolbox_2.4_User_Guide-Software-v01_00-EN.pdf?fileId=8ac78c8c7e7124d1017ed97e72563632&utm_source=cypress&utm_medium=referral&utm_campaign=202110_globe_en_all_integration-files) (locally available at *{ModusToolbox&trade; software install directory}/docs_{version}/mtb_user_guide.pdf*).
@@ -176,9 +183,9 @@ For using X509 based certificate authentication, the following steps may be refe
    An optional company name []:
    ```
 
-1. Copy the _x509_config.cfg_ file from the _scripts_ folder to _certificates_ folder.
+3. Copy the _x509_config.cfg_ file from the _scripts_ folder to _certificates_ folder.
 
-2. Run the following command in the modus shell in the _certificates_ directory to generate the X509 certificate. 
+4. Run the following command in the modus shell in the _certificates_ directory to generate the X509 certificate. 
 
    **Note**: The value of the common name field in the below command - `CN` can be the user's choice but must match the _registration ID_ on the Azure DPS portal's enrollment or the _device ID_ on the Azure IoT hub portal that will be created in the further steps, an example is shown below.
 
@@ -186,7 +193,7 @@ For using X509 based certificate authentication, the following steps may be refe
    openssl req -new -days 1024 -nodes -x509 -key dev_priv_key.pem -out device_cert.pem -extensions client_auth -config x509_config.cfg -subj "/CN=azure_dps_dev_test1"
    ```
 
-3. Run the following command in the modus shell in the _certificates_ directory to get the SHA thumbprint of the device certificate created in the previous step. Copy the fingerprint generated in the below command.
+5. Run the following command in the modus shell in the _certificates_ directory to get the SHA thumbprint of the device certificate created in the previous step. Copy the fingerprint generated in the below command.
 
       ```
       openssl x509 -noout -fingerprint -in device_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g'
@@ -198,17 +205,17 @@ For using X509 based certificate authentication, the following steps may be refe
       902E7A49F252A49D0AB30AB1D2FBEAE702495F2F
       ```
       
-4. For **Azure DPS flow** - Create _Individual Enrollment_ in the Azure DPS portal by referring to [X509 DPS device enrollment](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509?tabs=windows&pivots=programming-language-ansi-c) - Select the X509 mode of authentication and upload the device_cert.pem in both _Primary Certificate_ and _Secondary Certificate_ fields and then _save_. The _registration ID_ of the created enrollment will appear the same as the `CN` used in the previous step.
+6. For **Azure DPS flow** - Create _Individual Enrollment_ in the Azure DPS portal by referring to [X509 DPS device enrollment](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509?tabs=windows&pivots=programming-language-ansi-c) - Select the X509 mode of authentication and upload the device_cert.pem in both _Primary Certificate_ and _Secondary Certificate_ fields and then _save_. The _registration ID_ of the created enrollment will appear the same as the `CN` used in the previous step.
    
    For **without Azure DPS flow** - In the Azure portal, refer to [Azure device setup](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) and create the Azure IoT device using _X509 self-signed option_. Paste the same fingerprint copied in the previous step in both “primary” and “secondary” thumbprints. The _device name_ should be same as `Common Name` used in the _step 1_ of this section where the Root certificate was created. <br>
 
-5. Download the [Baltimore CyberTrust Root certificate](https://docs.microsoft.com/en-us/azure/security/fundamentals/tls-certificate-changes) and place it in the _certificates_ folder then run the below command to convert the certificate from `.crt` to `.pem`. The `out` parameter must be `azure_rootCA.pem`.
+7. Download the [Baltimore CyberTrust Root certificate](https://docs.microsoft.com/en-us/azure/security/fundamentals/tls-certificate-changes) and place it in the _certificates_ folder then run the below command to convert the certificate from `.crt` to `.pem`. The `out` parameter must be `azure_rootCA.pem`.
 
       ```
       openssl x509 -inform der -in BaltimoreCyberTrustRoot.crt -out azure_rootCA.pem
       ```
 
-6. In _source/mqtt_main.h_, Set `azure_root_ca_certificate` to the _azure_RootCA.pem_ and set device certificate & device key. The pem format of the certificates and keys needs to be used in the file. Use _scripts/format_X509_cert_key.py_ to generate the formatted pem to be used in _source/mqtt_main.h_. Copy and paste this script in _certificates_ folder and use in the following way.
+8. In _source/mqtt_main.h_, Set `azure_root_ca_certificate` to the _azure_RootCA.pem_ and set device certificate & device key. The pem format of the certificates and keys needs to be used in the file. Use _scripts/format_X509_cert_key.py_ to generate the formatted pem to be used in _source/mqtt_main.h_. Copy and paste this script in _certificates_ folder and use in the following way.
 
       ```
       python format_X509_cert_key.py azure_rootCA.pem device_cert.pem dev_priv_key.pem
@@ -229,85 +236,9 @@ _CY8CKIT-064S0S2-4343W_ requires provisioning of _keys_ and _policies_ into the 
    
    This section describes the provisioning steps for this example and the setup of SAS tokens into the Secure hardware, these will be used for a secure socket connection with the Azure cloud. <br>
 
-   **Note:** The KitProg3 must be in DAPLink mode for performing this section. Press the 'Mode' button on the kit until the Status LED blinks fast. Also, ensure the J26 jumper is open. After the steps in this section are complete, undo the previous state by pressing the 'Mode' button again until the Status LED stops blinking. Place the J26 jumper back.
+   **Note:** The KitProg3 must be in DAPLink mode for performing this section. Press the 'Mode' button on the kit until the Status LED blinks fast. Also, ensure the J26 jumper is open.
    
    Before generating the SAS tokens the kit needs to be provisioned with keys and policies using the following steps -
-
-   1. Navigate to _<mtb_shared>/trusted-firmware-m/< tag >/security_ folder in the modus shell.
-
-   2. Run the following command.
-
-      ```
-      cysecuretools --target CY8CKIT-064S0S2-4343W init
-      ```
-
-   3. Run the following command in the modus-shell from _<mtb_shared>/trusted-firmware-m/< tag >/security_ directory to generate keys. Select `n` if prompted for overwriting _keys_ folder.
-      
-      ```
-      cysecuretools -t CY8CKIT-064S0S2-4343W -p policy/policy_multi_CM0_CM4_tfm.json create-keys
-      ```
-   
-   4. Run the following command in the modus-shell from _<mtb_shared>/trusted-firmware-m/< tag >/security_ directory to provision/reprovision the kit.
-      
-      **Note:** 
-      
-      1. If the kit has not been provisioned before, then run the below command. 
-
-         ```
-         cysecuretools -t CY8CKIT-064S0S2-4343W -p policy/policy_multi_CM0_CM4_tfm.json provision-device
-         ```
-
-      1. If the kit been provisioned before, then run the below command.
-
-         ```
-         cysecuretools -t CY8CKIT-064S0S2-4343W -p policy/policy_multi_CM0_CM4_tfm.json re-provision-device
-         ```
-      
-   For SAS mode, a valid _device ID_ and corresponding _SAS token_ need to be stored in the secured element, following are the steps for the same. 
-
-   1. Create an Azure IoT _device_ or _Individual enrollment_ as mentioned in step 3 of the [Operation](#operation).
-
-   1. For **Azure DPS flow** - 
-      Update the file _source/mqtt_iot_sas_token_provision.c_ as follows -
-         - Update the registration ID in the `AZURE_CLIENT_DEVICE_ID` macro. 
-         - Update the SAS token in the `AZURE_CLIENT_SAS_TOKEN` macro. <br><br>
-   
-      For **without Azure DPS flow** - 
-      Update the file _source/mqtt_iot_sas_token_provision.c_ as follows -
-         - Update the device ID in the `AZURE_CLIENT_DEVICE_ID` macro.
-         - Update the SAS token in the `AZURE_CLIENT_SAS_TOKEN` macro. <br><br>
-
-   2. Run the application _source/mqtt_iot_sas_token_provision.c_ to store the device ID and SAS token in the secured element. To build the _source/mqtt_iot_sas_token_provision.c_ application:
-
-      Uncomment the following line in the _Makefile_ to disable the build of _source/main.c_.
-
-      `#CY_IGNORE += ./source/main.c`
-
-      Comment the following line to enable the build of _source/mqtt_iot_sas_token_provision.c_.
-   
-      `CY_IGNORE += ./source/mqtt_iot_sas_token_provision.c`
-
-      Perform clean, then build, and finally program the application in a similar way as done in [Using the code example](#using-the-code-example). Upon successful provisioning, a message similar to the following must appear.
-
-      **Figure 1: SAS token provision success**
-
-      ![](images/sas_token_provision_success.png)
-
-      After the successful provisioning of the SAS token into the hardware, enable _source/main.c_ and disable _source/mqtt_iot_sas_token_provision.c_ by editing the lines in the _Makefile_ as shown below.
-
-      ```
-      #CY_IGNORE += ./source/main.c
-      CY_IGNORE += ./source/mqtt_iot_sas_token_provision.c
-      ```
-      **Note**: For SAS-based authentication mode, the application should pass `azure_root_ca_certificate`, `azure_client_cert`, and `azure_client_key` values as `NULL` in _source/mqtt_main.h_.
-
-   </details>
-
-<details><summary><b>X509 certificate based authentication mode</b></summary><br>
-
-This section describes the provisioning steps for this example and the setup of X509 certificates into the secure hardware, these will be used for secure socket connection with the Azure cloud. <br>
-
-**Note:** The KitProg3 must be in DAPLink mode for performing this section. Press the 'Mode' button on the kit until the Status LED blinks fast. Also, ensure the J26 jumper is open. After the steps in this section are complete, undo the previous state by pressing the 'Mode' button again until the Status LED stops blinking. Place the J26 jumper back.
 
    1. Navigate to _<mtb_shared>/trusted-firmware-m/< tag >/security_ folder in the modus shell.
 
@@ -374,7 +305,122 @@ This section describes the provisioning steps for this example and the setup of 
       python reprov_helper.py -p policy/policy_multi_CM0_CM4_tfm_dev_certs.json -d cy8ckit-064s0s2-4343w
       ```
 
-   9. Run the following command in the modus shell in the _<mtb_shared>/trusted-firmware-m/< tag >/security/certificates_ directory to get the SHA thumbprint of the device certificate created in the previous step. Copy the fingerprint generated in the below command.
+   9. On the kit, press the 'Mode' button again until the kitprog3 status LED stops blinking and place the J26 jumper back.
+      
+   For SAS mode, a valid _device ID_ and corresponding _SAS token_ need to be stored in the secured element, following are the steps for the same. 
+
+   1. Create an Azure IoT _device_ or _Individual enrollment_ as mentioned in step 3 of the [Operation](#operation).
+
+   2. For **Azure DPS flow** - 
+      Update the file _source/mqtt_iot_sas_token_provision.c_ as follows -
+         - Update the registration ID in the `AZURE_CLIENT_DEVICE_ID` macro. 
+         - Update the SAS token in the `AZURE_CLIENT_SAS_TOKEN` macro. <br><br>
+   
+      For **without Azure DPS flow** - 
+      Update the file _source/mqtt_iot_sas_token_provision.c_ as follows -
+         - Update the device ID in the `AZURE_CLIENT_DEVICE_ID` macro.
+         - Update the SAS token in the `AZURE_CLIENT_SAS_TOKEN` macro. <br><br>
+
+   3. Run the application _source/mqtt_iot_sas_token_provision.c_ to store the device ID and SAS token in the secured element. To build the _source/mqtt_iot_sas_token_provision.c_ application:
+
+      Uncomment the following line in the _Makefile_ to disable the build of _source/main.c_.
+
+      `#CY_IGNORE += ./source/main.c`
+
+      Comment the following line to enable the build of _source/mqtt_iot_sas_token_provision.c_.
+   
+      `CY_IGNORE += ./source/mqtt_iot_sas_token_provision.c`
+
+      Perform clean, then build, and finally program the application in a similar way as done in [Using the code example](#using-the-code-example). Upon successful provisioning, a message similar to the following must appear.
+
+      **Figure 1: SAS token provision success**
+
+      ![](images/sas_token_provision_success.png)
+
+      After the successful provisioning of the SAS token into the hardware, enable _source/main.c_ and disable _source/mqtt_iot_sas_token_provision.c_ by editing the lines in the _Makefile_ as shown below.
+
+      ```
+      #CY_IGNORE += ./source/main.c
+      CY_IGNORE += ./source/mqtt_iot_sas_token_provision.c
+      ```
+      **Note**: For SAS-based authentication mode, the application should pass `azure_root_ca_certificate`, `azure_client_cert`, and `azure_client_key` values as `NULL` in _source/mqtt_main.h_.
+
+   </details>
+
+<details><summary><b>X509 certificate based authentication mode</b></summary><br>
+
+This section describes the provisioning steps for this example and the setup of X509 certificates into the secure hardware, these will be used for secure socket connection with the Azure cloud. <br>
+
+**Note:** The KitProg3 must be in DAPLink mode for performing this section. Press the 'Mode' button on the kit until the Status LED blinks fast. Also, ensure the J26 jumper is open.
+
+   1. Navigate to _<mtb_shared>/trusted-firmware-m/< tag >/security_ folder in the modus shell.
+
+   2. Run the following command.
+
+      ```
+      cysecuretools --target CY8CKIT-064S0S2-4343W init
+      ```
+
+   3. Create a folder called _certificates_ and then navigate into _certificates_ folder in modus shell. 
+
+   4. Run the following commands in the modus shell to generate the Root Certificate and Root key:
+
+      ```
+      openssl genrsa -out rootCA.key 2048
+      ```
+
+      ```
+      openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 1024 -out rootCA.pem
+      ```
+
+      When you run this command, you need to enter additional information, as shown in the following. Leave the `Common Name` and `Email Address` fields empty.
+      
+      ```
+      Country Name (2 letter code) [XX]:US
+      State or Province Name (full name) []:CA
+      Locality Name (e.g, city) [Default City]:SJ
+      Organization Name (e.g, company) [Default Company Ltd]:IFX
+      Organizational Unit Name (e.g, section) []:INFINEON
+      Common Name (e.g, your name or your server's hostname) []:
+      Email Address []:
+      ```
+
+   5. Download the [Baltimore CyberTrust Root certificate](https://docs.microsoft.com/en-us/azure/security/fundamentals/tls-certificate-changes) and place it in the _certificates_ folder then run the below command to convert the certificate from `.crt` to `.pem`. The `out` parameter must be `azure_rootCA.pem`.
+
+      ```
+      openssl x509 -inform der -in BaltimoreCyberTrustRoot.crt -out azure_rootCA.pem
+      ```
+
+   6. Inside the _<mtb_shared>/trusted-firmware-m/< tag >/security/policy_ folder, edit the “provisioning” section of the _policy_multi_CM0_CM4_tfm_dev_certs.json_ policy as shown below and then _save_ and _close_ this policy file.
+
+      ```
+      "provisioning":
+      {
+         "packet_dir": "../packets",
+         "chain_of_trust": ["../certificates/device_cert.pem", "../certificates/azure_rootCA.pem"]
+      },
+      ```
+
+   7. Run the following commands in the modus-shell from _<mtb_shared>/trusted-firmware-m/< tag >/security_ directory. Select `n` if prompted for overwriting _keys_ folder.
+      
+      **Note:** If you already have a provisioned kit, skip to the next step.
+
+      ```
+      cysecuretools -t CY8CKIT-064S0S2-4343W -p policy/policy_multi_CM0_CM4_tfm.json create-keys
+      cysecuretools -t CY8CKIT-064S0S2-4343W -p policy/policy_multi_CM0_CM4_tfm.json provision-device
+      ```
+
+   8. This step will generate _device certificate_ and provision the _device certificate_ & _azure_RootCA_ into the hardware.
+   
+      Run the following command in the modus shell in the <mtb_shared>/trusted-firmware-m/< tag >/security directory to create the device certificate & keys and provision them in the hardware. When prompted enter a device serial number of your choice, `1234` can be used as an example. Select `N` when asked to create new keys and allow for reprovisioning by selecting `y`.
+
+      ```
+      python reprov_helper.py -p policy/policy_multi_CM0_CM4_tfm_dev_certs.json -d cy8ckit-064s0s2-4343w
+      ```
+
+   9. On the kit, press the 'Mode' button again until the kitprog3 status LED stops blinking and place the J26 jumper back.
+
+  10. Run the following command in the modus shell in the _<mtb_shared>/trusted-firmware-m/< tag >/security/certificates_ directory to get the SHA thumbprint of the device certificate created in the previous step. Copy the fingerprint generated in the below command.
 
       ```
       openssl x509 -noout -fingerprint -in device_cert.pem | sed 's/://g'| sed 's/\(SHA1 Fingerprint=\)//g'
@@ -386,7 +432,7 @@ This section describes the provisioning steps for this example and the setup of 
       902E7A49F252A49D0AB30AB1D2FBEAE702495F2F
       ```
 
-   1. The `Subject` `CN` from the device certificate might be used in further steps, use the below command on the generated device certificate to note the same.
+  11. The `Subject` `CN` from the device certificate might be used in further steps, use the below command on the generated device certificate to note the same.
 
       ```
       openssl x509 -text -fingerprint -in device_cert.pem
@@ -398,7 +444,7 @@ This section describes the provisioning steps for this example and the setup of 
 
       ![](images/example_subject_common_name.png)
 
-   1. For **Azure DPS flow** - Create _Individual Enrollment_ in the Azure DPS portal by referring to [X509 DPS device enrollment](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509?tabs=windows&pivots=programming-language-ansi-c) - Select the X509 mode of authentication and upload the device_cert.pem in both _Primary Certificate_ and _Secondary Certificate_ fields and then _save_. The _registration ID_ of the created enrollment will appear the same as the `Subject` `CN` as noted in previous steps.
+  12. For **Azure DPS flow** - Create _Individual Enrollment_ in the Azure DPS portal by referring to [X509 DPS device enrollment](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509?tabs=windows&pivots=programming-language-ansi-c) - Select the X509 mode of authentication and upload the device_cert.pem in both _Primary Certificate_ and _Secondary Certificate_ fields and then _save_. The _registration ID_ of the created enrollment will appear the same as the `Subject` `CN` as noted in previous steps.
    
       For **without Azure DPS flow** - In the Azure portal, refer to [Azure device setup](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) and create the Azure IoT device using _X509 self-signed option_. Paste the same fingerprint copied in the previous step in both “primary” and “secondary” thumbprints. The _device name_ should be the same as the `Subject ` `CN` as noted in previous steps.
 
@@ -413,12 +459,6 @@ This section describes the provisioning steps for this example and the setup of 
 ## Operation
 
 1. Connect the board to your PC using the provided USB cable through the KitProg3 USB connector.
-
-2. Run the following command in the modus shell in the _scripts_ directory to ensure that the required modules are installed or already present ("Requirement already satisfied:" is printed).
-
-   ```
-   pip install -r requirements.txt
-   ```
 
 3. Select from either of the following methods for authentication of Azure IoT device with the Azure Hub. 
 
@@ -863,14 +903,13 @@ Application notes  | [AN228571](https://www.infineon.com/dgdl/Infineon-AN228571_
 Code examples  | [Using ModusToolbox&trade; software](https://github.com/Infineon/Code-Examples-for-ModusToolbox-Software) on GitHub <br>
 Device documentation | [PSoC&trade; 6 MCU datasheets](https://www.infineon.com/cms/en/search.html#!view=downloads&term=PSoC%206&doc_group=Data%20Sheet) <br> [PSoC&trade; 6 technical reference manuals](https://www.infineon.com/cms/en/search.html#!view=downloads&term=PSoC%206&doc_group=Additional%20Technical%20Information)
 Development kits |Select your kits from the [Evaluation board finder](https://www.infineon.com/cms/en/design-support/finder-selection-tools/product-finder/evaluation-board) page
-Libraries on GitHub  | [mtb-pdl-cat1](https://github.com/infineon/mtb-pdl-cat1) – PSoC&trade; 6 peripheral driver library (PDL)  <br> [mtb-hal-cat1](https://github.com/infineon/mtb-hal-cat1) – Hardware abstraction layer (HAL) library <br> [retarget-io](https://github.com/infineon/retarget-io) – Utility library to retarget STDIO messages to a UART port <br>
+Libraries on GitHub  | [mtb-pdl-cat1](https://github.com/Infineon/mtb-pdl-cat1) – PSoC&trade; 6 peripheral driver library (PDL)  <br> [mtb-hal-cat1](https://github.com/Infineon/mtb-hal-cat1) – Hardware abstraction layer (HAL) library <br> [retarget-io](https://github.com/Infineon/retarget-io) – Utility library to retarget STDIO messages to a UART port <br>
 Middleware on GitHub  | [psoc6-middleware](https://github.com/Infineon/modustoolbox-software#psoc-6-middleware-libraries) – Links to all PSoC&trade; 6 MCU middleware <br> [mqtt](https://github.com/Infineon/mqtt) – MQTT client library and documents <br> [wifi-connection-manager](https://github.com/Infineon/wifi-connection-manager) – Wi-Fi connection manager (WCM) library and documents <br> [wifi-mw-core](https://github.com/Infineon/wifi-mw-core) – Wi-Fi middleware core library and documents <br> [freeRTOS](https://github.com/Infineon/freertos) – FreeRTOS library and documents 
 Tools  | [Eclipse IDE for ModusToolbox&trade; software](https://www.cypress.com/modustoolbox) – ModusToolbox&trade; software is a collection of easy-to-use software and tools enabling rapid development with Infineon MCUs, covering applications from embedded sense and control to wireless and cloud-connected systems using AIROC&trade; Wi-Fi and Bluetooth® connectivity devices.
 
 <br>
 
 ## Other resources
-
 
 Infineon provides a wealth of data at www.infineon.com to help you select the right device, and quickly and effectively integrate it into your design.
 
@@ -885,6 +924,7 @@ Document title: *CE234014* – *Connecting to Azure IoT services using Azure SDK
  ------- | ---------------------
  1.0.0   | New code example
  2.0.0   | Updated steps for X509 based Azure DPS and combined Azure IoT hub features
+ 2.1.0   | Minor bug fixes and updated dependencies packages
 
 <br>
 

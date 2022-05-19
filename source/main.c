@@ -140,8 +140,8 @@ int main(void)
     /* Enable global interrupts */
     __enable_irq();
 
-    /* default for all logging to WARNING */
-    cy_log_init(CY_LOG_WARNING, NULL, NULL);
+    /* default for all logging to OFF */
+    cy_log_init(CY_LOG_OFF, NULL, NULL);
 
     /* Initialize retarget-io to use the debug UART port. */
     result = cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX,

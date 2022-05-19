@@ -168,38 +168,38 @@ void menu_task(void *arg)
 
         switch(uart_read_integer)
         {
-            case AZURE_DEVICE_PROVISIONING_SERVICE:
-            {
-                printf("Device Provisioning feature demo begins\n");
-                xTaskCreate(Azure_dps_app_task, "Azure_dps_app_task",
-                        AZURE_TASK_STACK_AZURE_DPS, NULL, AZURE_TASK_PRIORITY_AZURE_DPS, NULL);
-                valid_option = true;
-                break;
-            }
+        case AZURE_DEVICE_PROVISIONING_SERVICE:
+        {
+            printf("Device Provisioning feature demo begins\n");
+            xTaskCreate(Azure_dps_app_task, "Azure_dps_app_task",
+                    AZURE_TASK_STACK_AZURE_DPS, NULL, AZURE_TASK_PRIORITY_AZURE_DPS, NULL);
+            valid_option = true;
+            break;
+        }
 
-            case DEVICE_DEMO:
-            {
-                printf("Azure Device demo begins\n");
-                xTaskCreate(Azure_Device_Demo_app, "Azure_Device_Demo_app",
-                        AZURE_TASK_STACK_DEVICE_DEMO_APP, NULL, AZURE_TASK_PRIORITY_DEVICE_DEMO_APP, NULL);
-                valid_option = true;
-                break;
-            }
+        case DEVICE_DEMO:
+        {
+            printf("Azure Device demo begins\n");
+            xTaskCreate(Azure_Device_Demo_app, "Azure_Device_Demo_app",
+                    AZURE_TASK_STACK_DEVICE_DEMO_APP, NULL, AZURE_TASK_PRIORITY_DEVICE_DEMO_APP, NULL);
+            valid_option = true;
+            break;
+        }
 
-            case PLUG_N_PLAY:
-            {
-                printf("\nPlug and Play feature demo begins\n");
-                xTaskCreate(Azure_hub_pnp_app, "Azure_hub_pnp_app",
-                        AZURE_TASK_STACK_PNP, NULL, AZURE_TASK_PRIORITY_PNP, NULL);
-                valid_option = true;
-                break;
-            }
+        case PLUG_N_PLAY:
+        {
+            printf("\nPlug and Play feature demo begins\n");
+            xTaskCreate(Azure_hub_pnp_app, "Azure_hub_pnp_app",
+                    AZURE_TASK_STACK_PNP, NULL, AZURE_TASK_PRIORITY_PNP, NULL);
+            valid_option = true;
+            break;
+        }
 
-            default:
-            {
-                printf("\x1b[2J\x1b[;H");
-                printf("\r\nPlease select from the given valid options\r\n");
-            }
+        default:
+        {
+            printf("\x1b[2J\x1b[;H");
+            printf("\r\nPlease select from the given valid options\r\n");
+        }
         }
     }
 

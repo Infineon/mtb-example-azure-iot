@@ -1,8 +1,8 @@
 /******************************************************************************
- * File Name: mqtt_iot_hub_telemetry.c
+ * File Name: mqtt_iot_azure_device_demo_app.c
  *
- * Description: This file contains tasks and functions related to Azure Telemetry
- * feature task.
+ * Description: This file contains tasks and functions related to Azure device
+ * demo task.
  *
  ********************************************************************************
  * Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company) or
@@ -115,7 +115,11 @@
 
 #define DEVICE_TWIN_TIMEOUT_MSEC                    (500)
 
+#define TWIN_MESSAGE_WAIT_DELAY_MSEC                (1000)
+
 #define DEVICE_DEMO_APP_TIMEOUT_MSEC                (5)
+
+#define HUB_DIRECT_METHOD_EVENT_QUEUE_LENGTH        (10)
 
 /***********************************************************
  * Constants
@@ -140,7 +144,7 @@ static char                                mqtt_client_username_buffer[IOT_SAMPL
 static char                                mqtt_endpoint_buffer[IOT_SAMPLE_APP_BUFFER_SIZE_IN_BYTES];
 static volatile bool                       connect_state = false;
 
-static cy_queue_t                          hub_direct_method_event_queue = NULL;
+static QueueHandle_t                       hub_direct_method_event_queue = NULL;
 
 static cy_semaphore_t                      twin_app_sem = NULL;
 
@@ -427,7 +431,7 @@ static void send_reported_property(void)
 static void update_device_count_property(int32_t device_count)
 {
     device_count_value = device_count;
-    TEST_INFO(( "\r\n Client updated `%.*s` locally to %d.",
+    TEST_INFO(( "Client updated `%.*s` locally to %d.\n",
             (int)az_span_size(desired_device_count_property_name),
             az_span_ptr(desired_device_count_property_name),
             (int)device_count_value ));
@@ -555,12 +559,12 @@ static void handle_device_twin_message(cy_mqtt_publish_info_t *message,
              */
             update_device_count_property( desired_device_count );
 
-            TEST_INFO(( "\n\rReleasing twin_app_sem...." ));
-            result = cy_rtos_set_semaphore( &twin_app_sem, false );
-            if( result != CY_RSLT_SUCCESS )
+            result = xSemaphoreGive( twin_app_sem );
+            if( result != pdTRUE )
             {
-                TEST_INFO(( "\n\r Releasing twin_app_sem failed with Error : [0x%X] ", (unsigned int)result ));
+                TEST_INFO(( "Releasing twin_app_sem failed with Error : [0x%X]\n", (unsigned int)result ));
             }
+
         }
         break;
     }
@@ -752,8 +756,6 @@ static void mqtt_event_cb(cy_mqtt_t mqtt_handle, cy_mqtt_event_t event, void *ar
     cy_mqtt_publish_info_t *received_msg;
     az_iot_hub_client_c2d_request c2d_request;
 
-    cy_rslt_t result = CY_RSLT_SUCCESS;
-
     TEST_INFO(( "MQTT App callback with handle : %p \n", mqtt_handle ));
 
     switch( event.type )
@@ -773,8 +775,6 @@ static void mqtt_event_cb(cy_mqtt_t mqtt_handle, cy_mqtt_event_t event, void *ar
     case CY_MQTT_EVENT_TYPE_PUBLISH_RECEIVE :
         received_msg = &(event.data.pub_msg.received_message);
 
-        /* This if-else is for testing of combined app */
-
         /* Case for C2D message */
         if( strstr((char*)received_msg->topic, "/messages/devicebound/") != NULL)
         {
@@ -792,10 +792,10 @@ static void mqtt_event_cb(cy_mqtt_t mqtt_handle, cy_mqtt_event_t event, void *ar
             parse_hub_method_message( (char*)received_msg->topic, received_msg->topic_len, received_msg, &method_request );
             TEST_INFO(( "Client parsed method request." ));
             TEST_INFO(( "Pushing to direct method queue...." ));
-            result = cy_rtos_put_queue( &hub_direct_method_event_queue, (void *)&method_request, PUT_QUEUE_TIMEOUT_MSEC, false );
-            if( result != CY_RSLT_SUCCESS )
+
+            if( xQueueSend( hub_direct_method_event_queue, (void *)&method_request, pdMS_TO_TICKS(PUT_QUEUE_TIMEOUT_MSEC) ) != pdPASS )
             {
-                TEST_INFO(( "Pushing to hub_direct_method_event_queue failed with Error : [0x%X] ", (unsigned int)result ));
+                TEST_INFO(( "Pushing to hub_direct_method_event_queue failed\n"));
             }
         }
 
@@ -1228,29 +1228,27 @@ static cy_rslt_t configure_hub_environment_variables(void)
  ******************************************************************************/
 void method_feature_task(void *arg)
 {
-    cy_rslt_t TestRes = TEST_PASS ;
     uint32_t time_ms = 0;
     az_iot_hub_client_method_request method_request;
 
     /*
      * Initialize the queue for hub method events
      */
-    TestRes = cy_rtos_init_queue( &hub_direct_method_event_queue, 10, sizeof(az_iot_hub_client_method_request) );
-    if( TestRes == CY_RSLT_SUCCESS )
+    hub_direct_method_event_queue = xQueueCreate( HUB_DIRECT_METHOD_EVENT_QUEUE_LENGTH, sizeof(az_iot_hub_client_method_request) );
+    if(hub_direct_method_event_queue != NULL)
     {
-        TEST_INFO(( "cy_rtos_init_queue for methods feature ----------- Pass\n" ));
+        TEST_INFO(( "hub_direct_method_event_queue create for methods feature ----------- Pass\n" ));
     }
 
     else
     {
-        TEST_INFO(( "cy_rtos_init_queue for methods feature ----------- Fail\n" ));
+        TEST_INFO(( "hub_direct_method_event_queue create for methods feature ----------- Fail\n" ));
     }
 
     time_ms = ( METHOD_WAIT_LOOP_DURATION_MSEC );
     while( connect_state && (time_ms > 0) )
     {
-        TestRes = cy_rtos_get_queue( &hub_direct_method_event_queue, (void *)&method_request, GET_QUEUE_TIMEOUT_MSEC, false );
-        if( TestRes == CY_RSLT_SUCCESS )
+        if(xQueueReceive(hub_direct_method_event_queue, (void *)&method_request, pdMS_TO_TICKS(GET_QUEUE_TIMEOUT_MSEC) ) == pdPASS)
         {
             handle_method_request( &method_request );
             TEST_INFO(( " " ));
@@ -1294,18 +1292,20 @@ void device_twin_feature_task(void *arg)
         goto exit_device_twin;
     }
 
-    /* 2 Min check to make the app to work with CI/CD */
     time_ms = ( DEVICE_TWIN_WAIT_LOOP_DURATION_MSEC );
-    while( connect_state )
+    while( connect_state && (time_ms > 0))
     {
-        TestRes = cy_rtos_get_semaphore( &twin_app_sem, GET_SEMAPHORE_TIMEOUT_MSEC, false );
-        if( TestRes == CY_RSLT_SUCCESS )
+
+        TestRes = xSemaphoreTake( twin_app_sem, portMAX_DELAY );
+        if( TestRes == pdTRUE )
         {
             send_reported_property();
             TEST_INFO(( " " ));
             TEST_INFO(( "Client received messages." ));
         }
+
         time_ms = time_ms - DEVICE_TWIN_TIMEOUT_MSEC;
+        vTaskDelay(pdMS_TO_TICKS(TWIN_MESSAGE_WAIT_DELAY_MSEC));
     }
 
     exit_device_twin:
@@ -1338,15 +1338,15 @@ void Azure_Device_Demo_app(void *arg)
     (void)read_len;
 #endif
 
-    /* Initialize the queue for hub methods events */
-    TestRes = cy_rtos_init_semaphore( &twin_app_sem, 1, 0 );
-    if( TestRes == CY_RSLT_SUCCESS )
+    /* Initialize the semaphore for hub methods events */
+    twin_app_sem = xSemaphoreCreateCounting( 1, 0 );
+    if( twin_app_sem != NULL )
     {
-        TEST_INFO(( "cy_rtos_init_semaphore ----------- Pass\n" ));
+        TEST_INFO(( "xSemaphoreCreateCounting for Twin App ----------- Pass\n" ));
     }
     else
     {
-        TEST_INFO(( "cy_rtos_init_semaphore ----------- Fail\n" ));
+        TEST_INFO(( "xSemaphoreCreateCounting for Twin App ----------- Fail\n" ));
         goto exit;
     }
 

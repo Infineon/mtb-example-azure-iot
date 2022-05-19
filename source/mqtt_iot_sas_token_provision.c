@@ -143,8 +143,8 @@ void tfm_test_task(void * arg)
     get_len = 0;
     memset( &get_data, 0x00, sizeof(get_data) );
     TEST_DEBUG(("\n\rChecking for Device certificate....\n\r"));
-    psa_ps_get(DEVICE_CERT_UID, 0, sizeof(get_data), get_data, &get_len);
-    if(get_len>0)
+    uxStatus = psa_ps_get(DEVICE_CERT_UID, 0, sizeof(get_data), get_data, &get_len);
+    if((uxStatus == PSA_SUCCESS) && (get_len>0))
     {
         TEST_DEBUG(("\r\nDevice certificate is present at UID %d...!!!!!!\r\n",(int)DEVICE_CERT_UID));
     }
@@ -153,8 +153,8 @@ void tfm_test_task(void * arg)
     get_len = 0;
     memset( &get_data, 0x00, sizeof(get_data) );
     TEST_DEBUG(("\r\nChecking for Root certificate....\n\r"));
-    psa_ps_get(ROOT_CA_UID, 0, sizeof(get_data), get_data, &get_len);
-    if(get_len>0)
+    uxStatus = psa_ps_get(ROOT_CA_UID, 0, sizeof(get_data), get_data, &get_len);
+    if((uxStatus == PSA_SUCCESS) && (get_len>0))
     {
         TEST_DEBUG(("\r\nRootCA is present at UID %d...!!!!!!\r\n", (int)ROOT_CA_UID));
     }

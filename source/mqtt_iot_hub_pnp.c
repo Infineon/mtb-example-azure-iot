@@ -94,6 +94,9 @@
 #define PNP_APP_TIMEOUT_MSEC                        (500)
 
 #define PNP_MSG_EVENT_QUEUE_MSEC                    (500)
+
+#define PNP_MSG_EVENT_QUEUE_LENGTH                  (10)
+
 /************************************************************
  * Static Variables
  ************************************************************/
@@ -155,7 +158,7 @@ static double device_temperature_summation = DEFAULT_START_TEMP_CELSIUS;
 static uint32_t device_temperature_count = DEFAULT_START_TEMP_COUNT;
 static double device_average_temperature = DEFAULT_START_TEMP_CELSIUS;
 
-static cy_queue_t              pnp_msg_event_queue = NULL;
+static QueueHandle_t              pnp_msg_event_queue = NULL;
 
 typedef enum pnp_msg_type
 {
@@ -476,7 +479,6 @@ static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* o
 static void handle_command_request(cy_mqtt_publish_info_t *message,
         az_iot_hub_client_method_request * command_request)
 {
-    cy_rslt_t result = CY_RSLT_SUCCESS;
     az_span message_span = az_span_create((uint8_t*)message->payload, message->payload_len);
     pnp_msg_event_t *msg_event = NULL;
 
@@ -515,15 +517,14 @@ static void handle_command_request(cy_mqtt_publish_info_t *message,
         memcpy(&(msg_event->command_response_payload), &command_empty_response_payload, sizeof(az_span));
     }
 
-    TEST_INFO(("\r\nPushing to PNP message(device_command_request) event queue...\n"));
-    result = cy_rtos_put_queue(&pnp_msg_event_queue, (void *)&msg_event, PNP_MSG_EVENT_QUEUE_MSEC, false);
-    if(result != CY_RSLT_SUCCESS)
+    TEST_INFO(("Pushing to PNP message(device_command_request) event queue...\n"));
+    if( xQueueSend( pnp_msg_event_queue, (void *)&msg_event, pdMS_TO_TICKS(PNP_MSG_EVENT_QUEUE_MSEC) ) != pdPASS )
     {
-        TEST_INFO(("\r\nPushing to PNP message event queue failed with Error : [0x%X] ", (unsigned int)result));
+        TEST_INFO(("Pushing to PNP message event queue failed\n"));
         free(msg_event);
         return;
     }
-    TEST_INFO(("\r\nMessage(device_command_request) queued to PNP message event queue...\n"));
+    TEST_INFO(("Message(device_command_request) queued to PNP message event queue...\n"));
 }
 
 /******************************************************************************
@@ -1037,7 +1038,6 @@ static void process_device_twin_message(az_span message_span, bool is_twin_get)
 static void handle_device_twin_message(cy_mqtt_publish_info_t *message,
         az_iot_hub_client_twin_response *twin_response)
 {
-    cy_rslt_t result = CY_RSLT_SUCCESS;
     az_span message_span = az_span_create((uint8_t*)message->payload, message->payload_len);
     pnp_msg_event_t *msg_event = NULL;
 
@@ -1073,15 +1073,14 @@ static void handle_device_twin_message(cy_mqtt_publish_info_t *message,
 
     if(msg_event != NULL)
     {
-        TEST_INFO(("\r\nPushing to PNP message(device_twin_message) event queue...\n"));
-        result = cy_rtos_put_queue(&pnp_msg_event_queue, (void *)&msg_event, PNP_MSG_EVENT_QUEUE_MSEC, false);
-        if(result != CY_RSLT_SUCCESS)
+        TEST_INFO(("Pushing to PNP message(device_twin_message) event queue...\n"));
+        if( xQueueSend( pnp_msg_event_queue, (void *)&msg_event, pdMS_TO_TICKS(PNP_MSG_EVENT_QUEUE_MSEC) ) != pdPASS )
         {
-            TEST_INFO(("\r\nPushing to PNP message event queue failed with Error : [0x%X] ", (unsigned int)result));
+            TEST_INFO(("Pushing to PNP message event queue failed with Error\n"));
             free(msg_event);
             return;
         }
-        TEST_INFO(("\r\nMessage(device_twin_message) queued to PNP message event queue...\n"));
+        TEST_INFO(("Message(device_twin_message) queued to PNP message event queue...\n"));
     }
 }
 
@@ -1609,15 +1608,15 @@ void Azure_hub_pnp_app(void *arg)
     cy_log_init( CY_LOG_ERR, NULL, NULL );
 
     /* Initialize the queue for hub methods events. */
-    TestRes = cy_rtos_init_queue(&pnp_msg_event_queue, 10, sizeof(az_iot_provisioning_client_register_response *));
-    if(TestRes == CY_RSLT_SUCCESS)
+    pnp_msg_event_queue = xQueueCreate( PNP_MSG_EVENT_QUEUE_LENGTH, sizeof( unsigned long ) );
+    if(pnp_msg_event_queue != NULL)
     {
-        TEST_INFO(("\r\ncy_rtos_init_queue ----------- Pass \n"));
+        TEST_INFO(("pnp_msg_event_queue create ----------- Pass\n"));
         Passcount++;
     }
     else
     {
-        TEST_INFO(("\r\ncy_rtos_init_queue ----------- Fail \n"));
+        TEST_INFO(("pnp_msg_event_queue create ----------- Fail\n"));
         Failcount++;
         goto exit;
     }
@@ -1734,8 +1733,7 @@ void Azure_hub_pnp_app(void *arg)
     time_ms = ( MESSAGE_WAIT_LOOP_DURATION_MSEC );
     while((connect_state) && (time_ms > 0))
     {
-        TestRes = cy_rtos_get_queue(&pnp_msg_event_queue, (void *)&msg_event, GET_QUEUE_TIMEOUT_MSEC, false);
-        if(TestRes != CY_RSLT_SUCCESS)
+        if(xQueueReceive( pnp_msg_event_queue, (void *)&msg_event, pdMS_TO_TICKS(GET_QUEUE_TIMEOUT_MSEC) ) != pdPASS)
         {
             /* No need to do anything */
         }

@@ -69,7 +69,7 @@
 #define DEBUG_TASK_CREATION_ERROR       1
 
 /* Azure Menu */
-#define MENU_AZURE_IOT_HUB                                                      \
+#define MENU_AZURE_IOT_HUB                                                              \
         "\n"                                                                            \
         "Please select the index of Azure IoT Hub feature to be tested from below:\n"   \
         "\n"                                                                            \
@@ -78,30 +78,30 @@
         "3. PnP (Plug and Play)\n"                                                      \
 
 /* Azure Welcome Message */
-#define AZURE_WELCOME_MESSAGE                                                   \
+#define AZURE_WELCOME_MESSAGE                                                           \
         "\r\n==================================================================\n"      \
         "\r\n Welcome to the Azure IoT Hub Demo \n"                                     \
         "\r\n==================================================================\n"      \
 
 /* Stack sizes for Menu task */
-#define MENU_TASK_STACK                         (1024 * 10)
+#define MENU_TASK_STACK                         (1024 * 5)
 
 /* Priorities for Menu task */
 #define MENU_TASK_PRIORITY                      (5)
 
 /* Stack sizes for Azure features tasks */
-#define AZURE_TASK_STACK_AZURE_DPS              (1024 * 10)
-#define AZURE_TASK_STACK_PNP                    (1024 * 10)
-#define AZURE_TASK_STACK_DEVICE_DEMO_APP        (1024 * 10)
-#define AZURE_TASK_STACK_METHODS                (1024 * 10)
-#define AZURE_TASK_STACK_TWIN                   (1024 * 10)
+#define AZURE_TASK_STACK_AZURE_DPS              (1024 * 5)
+#define AZURE_TASK_STACK_PNP                    (1024 * 5)
+#define AZURE_TASK_STACK_DEVICE_DEMO_APP        (1024 * 5)
+#define AZURE_TASK_STACK_METHODS                (1024 * 5)
+#define AZURE_TASK_STACK_TWIN                   (1024 * 5)
 
 /* Priorities for Azure features tasks */
 #define AZURE_TASK_PRIORITY_AZURE_DPS           (5)
 #define AZURE_TASK_PRIORITY_PNP                 (5)
 #define AZURE_TASK_PRIORITY_DEVICE_DEMO_APP     (5)
 #define AZURE_TASK_PRIORITY_METHODS             (5)
-#define AZURE_TASK_PRIORITY_TWIN                (6)
+#define AZURE_TASK_PRIORITY_TWIN                (5)
 
 /******************************************************************************
  * Global Variables
