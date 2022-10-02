@@ -47,7 +47,7 @@
 #include <lwip/tcpip.h>
 #include <lwip/api.h>
 #include <cy_retarget_io.h>
-#include "cy_lwip.h"
+
 #include <cybsp_wifi.h>
 #include "cy_nw_helper.h"
 #include "cy_wcm.h"

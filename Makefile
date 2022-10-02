@@ -7,7 +7,7 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2021-2022, Cypress Semiconductor Corporation (an Infineon company)
+# Copyright 2022, Cypress Semiconductor Corporation (an Infineon company)
 # SPDX-License-Identifier: Apache-2.0
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,14 @@
 ################################################################################
 # Basic Configuration
 ################################################################################
+
+# Type of ModusToolbox Makefile Options include:
+#
+# COMBINED    -- Top Level Makefile usually for single standalone application
+# APPLICATION -- Top Level Makefile usually for multi project application
+# PROJECT     -- Project Makefile under Application
+#
+MTB_TYPE=COMBINED
 
 # Target board/hardware (BSP).
 # To change the target, it is recommended to use the Library manager
@@ -79,11 +87,7 @@ VERBOSE=
 # ... then code in directories named COMPONENT_foo and COMPONENT_bar will be
 # added to the build
 #
-COMPONENTS=FREERTOS MBEDTLS LWIP SECURE_SOCKETS
-
-ifeq ($(TARGET), CY8CKIT-064S0S2-4343W)
-COMPONENTS += TFM_NS_INTERFACE
-endif
+COMPONENTS+=FREERTOS MBEDTLS LWIP SECURE_SOCKETS
 
 # Like COMPONENTS, but disable optional code that was enabled by default.
 DISABLE_COMPONENTS=
@@ -96,12 +100,7 @@ SOURCES=
 
 # Like SOURCES, but for include directories. Value should be paths to
 # directories (without a leading -I).
-INCLUDES=
-
-ifeq ($(TARGET), CY8CKIT-064S0S2-4343W)
-INCLUDES += $(call CY_MACRO_FINDLIB,trusted-firmware-m)/COMPONENT_TFM_NS_INTERFACE/include
-INCLUDES+=libs/trusted-firmware-m/COMPONENT_TFM_NS_INTERFACE/include
-endif
+INCLUDES=./configs
 
 # Custom configuration of mbedtls library.
 MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"configs/mbedtls_user_config.h"'
@@ -109,18 +108,15 @@ MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"configs/mbedtls_user_config.h"'
 # Add additional defines to the build process (without a leading -D).
 DEFINES=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RTOS_AWARE CY_RETARGET_IO_CONVERT_LF_TO_CRLF ENABLE_MQTT_LOGS
 
-ifeq ($(TARGET), CY8CKIT-064S0S2-4343W)
-DEFINES += CY_TFM_PSA_SUPPORTED CY_SECURE_SOCKETS_PKCS_SUPPORT
-CY_SECURE_POLICY_NAME = policy_multi_CM0_CM4_tfm_dev_certs
-endif
-
 # CY8CPROTO-062-4343W board shares the same GPIO for the user button (USER BTN1)
 # and the CYW4343W host wake up pin. Since this example uses the GPIO for  
 # interfacing with the user button, the SDIO interrupt to wake up the host is
 # disabled by setting CY_WIFI_HOST_WAKE_SW_FORCE to '0'.
-ifeq ($(TARGET), CY8CPROTO-062-4343W)
+# 
+# If you wish to enable this host wake up feature, Comment the below DEFINES line. 
+# If you want this feature on CY8CPROTO-062-4343W, change the GPIO pin for USER BTN 
+# in design/hardware & Comment the below DEFINES line.
 DEFINES+=CY_WIFI_HOST_WAKE_SW_FORCE=0
-endif
 
 DEFINES += HTTP_USER_AGENT_VALUE="\"anycloud-http-client\""
 
@@ -169,11 +165,6 @@ PREBUILD=
 
 # Custom post-build commands to run.
 POSTBUILD=
-
-# Disabled compilation of FreeRTOS-pkcs11-psa for non-secure hardware.
-ifneq ($(TARGET), CY8CKIT-064S0S2-4343W)
-CY_IGNORE+= $(SEARCH_freertos-pkcs11-psa)
-endif
 
 ################################################################################
 # Paths
@@ -226,5 +217,13 @@ $(error Unable to find any of the available CY_TOOLS_PATHS -- $(CY_TOOLS_PATHS).
 endif
 
 $(info Tools Directory: $(CY_TOOLS_DIR))
+
+# Defines and includes for a TFM enabled kit
+DEFINES+=$(if $(filter TFM_S_FW,$(BSP_COMPONENTS)),CY_TFM_PSA_SUPPORTED CY_SECURE_SOCKETS_PKCS_SUPPORT)
+CY_SECURE_POLICY_NAME=$(if $(filter TFM_S_FW,$(BSP_COMPONENTS)),policy_multi_CM0_CM4_tfm_dev_certs)
+INCLUDES+=$(if $(filter TFM_S_FW,$(BSP_COMPONENTS)),$(SEARCH_trusted-firmware-m)/COMPONENT_TFM_NS_INTERFACE/include)
+
+# Ignore the freertos-pkcs library for non-secure kits
+CY_IGNORE+=$(if $(filter TFM_S_FW,$(BSP_COMPONENTS)),,$(SEARCH_freertos-pkcs11-psa))
 
 include $(CY_TOOLS_DIR)/make/start.mk

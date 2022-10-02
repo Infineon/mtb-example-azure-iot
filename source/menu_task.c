@@ -55,7 +55,6 @@
 
 /* IoT SDK, Secure Sockets, and MQTT initialization */
 #include "cy_tcpip_port_secure_sockets.h"
-
 #include "mqtt_main.h"
 
 /*******************************************************************************

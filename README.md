@@ -7,17 +7,17 @@ In this example, the [Azure C SDK port](https://github.com/Infineon/azure-c-sdk-
 
 ## Requirements
 
-- [ModusToolbox&trade; software](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software/) v2.4 (tested with v2.4) or later
-- Board support package (BSP) minimum required version: 3.0.0
+- [ModusToolbox&trade; software](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software/) v3.0 or later (tested with v3.0)
+- Board support package (BSP) minimum required version: 4.0.0
 - Programming language: C
 - Associated parts: All [PSoC&trade; 6 MCU](https://www.infineon.com/cms/en/product/microcontroller/32-bit-psoc-arm-cortex-microcontroller/psoc-6-32-bit-arm-cortex-m4-mcu/) parts, [AIROC™ CYW43012 Wi-Fi & Bluetooth® combo chip](https://www.infineon.com/cms/en/product/wireless-connectivity/airoc-wi-fi-plus-bluetooth-combos/cyw43012/), [AIROC™ CYW4343W Wi-Fi & Bluetooth® combo chip](https://www.infineon.com/cms/en/product/wireless-connectivity/airoc-wi-fi-plus-bluetooth-combos/cyw4343w/), [AIROC™ CYW4373 Wi-Fi & Bluetooth® combo chip](https://www.infineon.com/cms/en/product/wireless-connectivity/airoc-wi-fi-plus-bluetooth-combos/cyw4373), [AIROC™ CYW43439 Wi-Fi & Bluetooth® combo chip](https://www.infineon.com/cms/en/product/wireless-connectivity/airoc-wi-fi-plus-bluetooth-combos/cyw43439)
 
 
 ## Supported toolchains (make variable 'TOOLCHAIN')
 
-- GNU Arm® embedded compiler v10.3.1 (`GCC_ARM`) - Default value of `TOOLCHAIN`
-- Arm&reg; compiler v6.13 (`ARM`)
-- IAR C/C++ compiler v8.42.2 (`IAR`)
+- GNU Arm&reg; embedded compiler v10.3.1 (`GCC_ARM`) - Default value of `TOOLCHAIN`
+- Arm&reg; compiler v6.16 (`ARM`)
+- IAR C/C++ compiler v9.30.1 (`IAR`)
 
 
 ## Supported kits (make variable 'TARGET')
@@ -50,26 +50,26 @@ This example requires the setup of Azure IoT Hub on the Microsoft Azure portal. 
 
 Refer to the following links:
 
-- [Azure hub setup](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal#create-an-iot-hub) <br>
+- [Azure hub setup](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal#create-an-iot-hub) <br />
                     
-- [Visual Studio Code setup](https://code.visualstudio.com/download) <br>
+- [Visual Studio Code setup](https://code.visualstudio.com/download) <br />
 
-- [Azure IoT Tools](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.azure-iot-tools)<br>
+- [Azure IoT Tools](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.azure-iot-tools)<br />
 
-- [Set up your Azure IoT Hub in VS Code](https://devblogs.microsoft.com/iotdev/introducing-azure-iot-tools-for-visual-studio-code/#set-up-your-azure-iot-hub-in-vs-code)<br>
+- [Set up your Azure IoT Hub in VS Code](https://devblogs.microsoft.com/iotdev/introducing-azure-iot-tools-for-visual-studio-code/#set-up-your-azure-iot-hub-in-vs-code)<br />
 
 ## Using the code example
 
 Create the project and open it using one of the following:
 
 <details><summary><b>In Eclipse IDE for ModusToolbox&trade; software</b></summary>
-<br>
+<br />
 
-1. Click the **New Application** link in the **Quick Panel** (or, use **File** > **New** > **ModusToolbox Application**). This launches the [Project Creator](https://www.infineon.com/dgdl/Infineon-ModusToolbox_Project_Creator_Guide_3-UserManual-v01_00-EN.pdf?fileId=8ac78c8c7d718a49017d99bcabbd31e5&utm_source=cypress&utm_medium=referral&utm_campaign=202110_globe_en_all_integration-files) tool.
+1. Click the **New Application** link in the **Quick Panel** (or, use **File** > **New** > **ModusToolbox&trade; Application**). This launches the [Project Creator](https://www.infineon.com/ModusToolboxProjectCreator) tool.
 
 2. Pick a kit supported by the code example from the list shown in the **Project Creator - Choose Board Support Package (BSP)** dialog.
 
-   When you select a supported kit, the example is reconfigured automatically to work with the kit. To work with a different supported kit later, use the [Library Manager](https://www.infineon.com/dgdl/Infineon-ModusToolbox_Library_Manager_User_Guide_3-UserManual-v01_00-EN.pdf?fileId=8ac78c8c7d718a49017d99ab34b831ce&utm_source=cypress&utm_medium=referral&utm_campaign=202110_globe_en_all_integration-files) to choose the BSP for the supported kit. You can use the Library Manager to select or update the BSP and firmware libraries used in this application. To access the Library Manager, click the link from the **Quick Panel**.
+   When you select a supported kit, the example is reconfigured automatically to work with the kit. To work with a different supported kit later, use the [Library Manager](https://www.infineon.com/ModusToolboxLibraryManager) to choose the BSP for the supported kit. You can use the Library Manager to select or update the BSP and firmware libraries used in this application. To access the Library Manager, click the link from the **Quick Panel**.
 
    You can also just start the application creation process again and select a different kit.
 
@@ -83,18 +83,18 @@ Create the project and open it using one of the following:
 
 6. Click **Create** to complete the application creation process.
 
-For more details, see the [Eclipse IDE for ModusToolbox&trade; software user guide](https://www.infineon.com/dgdl/Infineon-Eclipse_IDE_for_ModusToolbox_User_Guide_1-UserManual-v01_00-EN.pdf?fileId=8ac78c8c7d718a49017d99bcb86331e8&utm_source=cypress&utm_medium=referral&utm_campaign=202110_globe_en_all_integration-files) (locally available at *{ModusToolbox&trade; software install directory}/ide_{version}/docs/mt_ide_user_guide.pdf*).
+For more details, see the [Eclipse IDE for ModusToolbox&trade; software user guide](https://www.infineon.com/MTBEclipseIDEUserGuide) (locally available at *{ModusToolbox&trade; software install directory}/docs_{version}/mt_ide_user_guide.pdf*).
 
 </details>
 
 <details><summary><b>In command-line interface (CLI)</b></summary>
-<br>
+<br />
 
 ModusToolbox&trade; software provides the Project Creator as both a GUI tool and the command line tool, "project-creator-cli". The CLI tool can be used to create applications from a CLI terminal or from within batch files or shell scripts. This tool is available in the *{ModusToolbox&trade; software install directory}/tools_{version}/project-creator/* directory.
 
 Use a CLI terminal to invoke the "project-creator-cli" tool. On Windows, use the command line "modus-shell" program provided in the ModusToolbox&trade; software installation instead of a standard Windows command-line application. This shell provides access to all ModusToolbox&trade; software tools. You can access it by typing `modus-shell` in the search box in the Windows menu. In Linux and macOS, you can use any terminal application.
 
-This tool has the following arguments:
+The "project-creator-cli" tool has the following arguments:
 
 Argument | Description | Required/optional
 ---------|-------------|-----------
@@ -103,7 +103,7 @@ Argument | Description | Required/optional
 `--target-dir`| Specify the directory in which the application is to be created if you prefer not to use the default current working directory | Optional
 `--user-app-name`| Specify the name of the application if you prefer to have a name other than the example's default name | Optional
 
-<br>
+<br />
 
 The following example will clone the "[Azure IoT](https://github.com/Infineon/mtb-example-mtb-example-azure-iot)" application with the desired name "AzureIoT" configured for the *CY8CKIT-064S0S2-4343W* BSP into the specified working directory, *C:/mtb_projects*:
 
@@ -113,13 +113,34 @@ The following example will clone the "[Azure IoT](https://github.com/Infineon/mt
 
 **Note:** The project-creator-cli tool uses the `git clone` and `make getlibs` commands to fetch the repository and import the required libraries. For details, see the "Project creator tools" section of the [ModusToolbox&trade; software user guide](https://www.infineon.com/dgdl/Infineon-ModusToolbox_2.4_User_Guide-Software-v01_00-EN.pdf?fileId=8ac78c8c7e7124d1017ed97e72563632&utm_source=cypress&utm_medium=referral&utm_campaign=202110_globe_en_all_integration-files) (locally available at *{ModusToolbox&trade; software install directory}/docs_{version}/mtb_user_guide.pdf*).
 
+To work with a different supported kit later, use the [Library Manager](https://www.infineon.com/ModusToolboxLibraryManager) to choose the BSP for the supported kit. You can invoke the Library Manager GUI tool from the terminal using `make modlibs` command or use the Library Manager CLI tool "library-manager-cli" to change the BSP.
+
+The "library-manager-cli" tool has the following arguments:
+
+Argument | Description | Required/optional
+---------|-------------|-----------
+`--add-bsp-name` | Name of the BSP that should be added to the application | Required
+`--set-active-bsp` | Name of the BSP that should be as active BSP for the application | Required
+`--add-bsp-version`| Specify the version of the BSP that should be added to the application if you do not wish to use the latest from manifest | Optional
+`--add-bsp-location`| Specify the location of the BSP (local/shared) if you prefer to add the BSP in a shared path | Optional
+
+<br />
+
+Following example adds the CY8CPROTO-062-4343W BSP to the already created application and makes it the active BSP for the app:
+
+   ```
+   library-manager-cli --project "C:/mtb_projects/MyHelloWorld" --add-bsp-name CY8CPROTO-062-4343W --add-bsp-version "latest-v4.X" --add-bsp-location "local"
+
+   library-manager-cli --project "C:/mtb_projects/MyHelloWorld" --set-active-bsp APP_CY8CPROTO-062-4343W
+   ```
+
 </details>
 
 <details><summary><b>In third-party IDEs</b></summary>
 
 Use one of the following options:
 
-- **Use the standalone [Project Creator](https://www.infineon.com/dgdl/Infineon-ModusToolbox_Project_Creator_Guide_3-UserManual-v01_00-EN.pdf?fileId=8ac78c8c7d718a49017d99bcabbd31e5&utm_source=cypress&utm_medium=referral&utm_campaign=202110_globe_en_all_integration-files) tool:**
+- **Use the standalone [Project Creator](https://www.infineon.com/ModusToolboxProjectCreator) tool:**
 
    1. Launch Project Creator from the Windows Start menu or from *{ModusToolbox&trade; software install directory}/tools_{version}/project-creator/project-creator.exe*.
 
@@ -129,17 +150,17 @@ Use one of the following options:
 
    4. Click **Create** and follow the instructions printed in the bottom pane to import or open the exported project in the respective IDE.
 
-<br>
+<br />
 
 - **Use command-line interface (CLI):**
 
-   1. Follow the instructions from the **In command-line interface (CLI)** section to create the application, and then import the libraries using the `make getlibs` command.
+   1. Follow the instructions from the **In command-line interface (CLI)** section to create the application.
 
    2. Export the application to a supported IDE using the `make <ide>` command.
 
    3. Follow the instructions displayed in the terminal to create or import the application as an IDE project.
 
-For a list of supported IDEs and more details, see the "Exporting to IDEs" section of the [ModusToolbox&trade; software user guide](https://www.infineon.com/dgdl/Infineon-ModusToolbox_2.4_User_Guide-Software-v01_00-EN.pdf?fileId=8ac78c8c7e7124d1017ed97e72563632&utm_source=cypress&utm_medium=referral&utm_campaign=202110_globe_en_all_integration-files) (locally available at *{ModusToolbox&trade; software install directory}/docs_{version}/mtb_user_guide.pdf*).
+For a list of supported IDEs and more details, see the "Exporting to IDEs" section of the [ModusToolbox&trade; software user guide](https://www.infineon.com/ModusToolboxUserGuide) (locally available at *{ModusToolbox&trade; software install directory}/docs_{version}/mtb_user_guide.pdf*).
 
 </details>
 
@@ -149,12 +170,12 @@ This section contains the steps to set up the X509 or SAS credentials on the har
 
 <details><summary><b>Credentials setup for non-secured platform </b></summary>
 
-For SAS based authentication, the token generation steps are mentioned in the corresponding section of [Operation](#operation). <br>
+For SAS based authentication, the token generation steps are mentioned in the corresponding section of [Operation](#operation). <br />
 For using X509 based certificate authentication, the following steps may be referred.
 
    <details><summary><b>X509 certificate based authentication mode</b></summary>
-   <br>
-   Use the following steps to generate the device's X509 self-signed certificate and private key to set up the X509 authentication based device on Azure IoT Hub. <br> <br>
+   <br />
+   Use the following steps to generate the device's X509 self-signed certificate and private key to set up the X509 authentication based device on Azure IoT Hub. <br /> <br />
 
 1. Create a _certificates_ folder.
 
@@ -207,7 +228,7 @@ For using X509 based certificate authentication, the following steps may be refe
       
 6. For **Azure DPS flow** - Create _Individual Enrollment_ in the Azure DPS portal by referring to [X509 DPS device enrollment](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509?tabs=windows&pivots=programming-language-ansi-c) - Select the X509 mode of authentication and upload the device_cert.pem in both _Primary Certificate_ and _Secondary Certificate_ fields and then _save_. The _registration ID_ of the created enrollment will appear the same as the `CN` used in the previous step.
    
-   For **without Azure DPS flow** - In the Azure portal, refer to [Azure device setup](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) and create the Azure IoT device using _X509 self-signed option_. Paste the same fingerprint copied in the previous step in both “primary” and “secondary” thumbprints. The _device name_ should be same as `Common Name` used in the _step 1_ of this section where the Root certificate was created. <br>
+   For **without Azure DPS flow** - In the Azure portal, refer to [Azure device setup](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub) and create the Azure IoT device using _X509 self-signed option_. Paste the same fingerprint copied in the previous step in both “primary” and “secondary” thumbprints. The _device name_ should be same as `Common Name` used in the _step 1_ of this section where the Root certificate was created. <br />
 
 7. Download the [Baltimore CyberTrust Root certificate](https://docs.microsoft.com/en-us/azure/security/fundamentals/tls-certificate-changes) and place it in the _certificates_ folder then run the below command to convert the certificate from `.crt` to `.pem`. The `out` parameter must be `azure_rootCA.pem`.
 
@@ -228,13 +249,13 @@ For using X509 based certificate authentication, the following steps may be refe
 </details>
 
 <details><summary><b>Credentials setup for a secured platform (CY8CKIT-064S0S2-4343W)</b></summary>
-<br>
+<br />
 
 _CY8CKIT-064S0S2-4343W_ requires provisioning of _keys_ and _policies_ into the hardware, following sections describe the steps for the same. These secure keys and policies are used during the _secure boot flow_. For more detailed information on _secure boot sdk_ refer to the [PSoC™ 64 "Secure Boot" user guide.](https://www.infineon.com/dgdlac/Infineon-PSoC_64_Secure_MCU_Secure_Boot_SDK_User_Guide-Software-v07_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0f8c361a7666&utm_source=cypress&utm_medium=referral&utm_campaign=202110_globe_en_all_integration-software).
 
-<details><summary><b>Shared access signature (SAS) based authentication mode</b></summary><br>
+<details><summary><b>Shared access signature (SAS) based authentication mode</b></summary><br />
    
-   This section describes the provisioning steps for this example and the setup of SAS tokens into the Secure hardware, these will be used for a secure socket connection with the Azure cloud. <br>
+   This section describes the provisioning steps for this example and the setup of SAS tokens into the Secure hardware, these will be used for a secure socket connection with the Azure cloud. <br />
 
    **Note:** The KitProg3 must be in DAPLink mode for performing this section. Press the 'Mode' button on the kit until the Status LED blinks fast. Also, ensure the J26 jumper is open.
    
@@ -314,12 +335,12 @@ _CY8CKIT-064S0S2-4343W_ requires provisioning of _keys_ and _policies_ into the 
    2. For **Azure DPS flow** - 
       Update the file _source/mqtt_iot_sas_token_provision.c_ as follows -
          - Update the registration ID in the `AZURE_CLIENT_DEVICE_ID` macro. 
-         - Update the SAS token in the `AZURE_CLIENT_SAS_TOKEN` macro. <br><br>
+         - Update the SAS token in the `AZURE_CLIENT_SAS_TOKEN` macro. <br /><br />
    
       For **without Azure DPS flow** - 
       Update the file _source/mqtt_iot_sas_token_provision.c_ as follows -
          - Update the device ID in the `AZURE_CLIENT_DEVICE_ID` macro.
-         - Update the SAS token in the `AZURE_CLIENT_SAS_TOKEN` macro. <br><br>
+         - Update the SAS token in the `AZURE_CLIENT_SAS_TOKEN` macro. <br /><br />
 
    3. Run the application _source/mqtt_iot_sas_token_provision.c_ to store the device ID and SAS token in the secured element. To build the _source/mqtt_iot_sas_token_provision.c_ application:
 
@@ -347,9 +368,9 @@ _CY8CKIT-064S0S2-4343W_ requires provisioning of _keys_ and _policies_ into the 
 
    </details>
 
-<details><summary><b>X509 certificate based authentication mode</b></summary><br>
+<details><summary><b>X509 certificate based authentication mode</b></summary><br />
 
-This section describes the provisioning steps for this example and the setup of X509 certificates into the secure hardware, these will be used for secure socket connection with the Azure cloud. <br>
+This section describes the provisioning steps for this example and the setup of X509 certificates into the secure hardware, these will be used for secure socket connection with the Azure cloud. <br />
 
 **Note:** The KitProg3 must be in DAPLink mode for performing this section. Press the 'Mode' button on the kit until the Status LED blinks fast. Also, ensure the J26 jumper is open.
 
@@ -462,17 +483,17 @@ This section describes the provisioning steps for this example and the setup of 
 
 3. Select from either of the following methods for authentication of Azure IoT device with the Azure Hub. 
 
-      <details><summary><b>Shared access signature (SAS)-based authentication mode </b></summary><br>
+      <details><summary><b>Shared access signature (SAS)-based authentication mode </b></summary><br />
 
       1. Set the `SAS_TOKEN_AUTH` macro to `1` in _source/azure_common.h_.
 
       2. Update the files as follows:
          
-         <details><summary><b> Non-secure hardware </b></summary><br>
+         <details><summary><b> Non-secure hardware </b></summary><br />
 
          For non-secure hardware platforms like _CY8CPROTO-062-4343W_, the SAS token can be used in the following ways. Select either as per the use case.
          
-         <details><summary><b>Azure Device Provisioning Service (DPS)</b></summary><br>
+         <details><summary><b>Azure Device Provisioning Service (DPS)</b></summary><br />
 
             The following steps are used to generate the output of _**1. Azure Device Provisioning Service**_ menu option of this ModusToolbox&trade; application.
             Upon completing the following steps, the status of the provisioning is as shown in **Figure 8**.
@@ -485,16 +506,16 @@ This section describes the provisioning steps for this example and the setup of 
             
             1. In _source/azure_common.h_, set the `SAS_TOKEN_LOCATION_FLASH` macro as `true`.
 
-            1. In _source/mqtt_main.h_ update the following macros: <br>
-               - Update the above generated SAS token in `IOT_AZURE_PASSWORD`. <br>
-               - Update the DPS registration ID in `IOT_AZURE_DPS_REGISTRATION_ID`. <br>
+            1. In _source/mqtt_main.h_ update the following macros: <br />
+               - Update the above generated SAS token in `IOT_AZURE_PASSWORD`. <br />
+               - Update the DPS registration ID in `IOT_AZURE_DPS_REGISTRATION_ID`. <br />
                - Update the ID scope value in `IOT_AZURE_ID_SCOPE`.
 
          </details>   
 
-         **OR**<br>
+         **OR**<br />
 
-         <details><summary><b>Without Azure Device Provisioning Service (DPS)</b></summary><br>
+         <details><summary><b>Without Azure Device Provisioning Service (DPS)</b></summary><br />
 
          The following steps are used to generate the output of _**2. Azure Device App (C2D, Telemetry, Methods, Twin)**_ and _**3. PnP (Plug and Play)**_ menu options of this ModusToolbox&trade; application.
 
@@ -504,22 +525,22 @@ This section describes the provisioning steps for this example and the setup of 
             
          1. In _source/azure_common.h_, set the `SAS_TOKEN_LOCATION_FLASH` macro as `true`.
 
-         1. In _source/mqtt_main.h_ update the following macros: <br>
-            - Update the device ID in `MQTT_CLIENT_IDENTIFIER_AZURE_SAS`. <br>
-            - Update host name of the created IoT hub in `IOT_DEMO_SERVER_AZURE`. <br>
-            - Update device ID in `IOT_AZURE_USERNAME`. <br>
-            - Update the generated SAS token in `IOT_AZURE_PASSWORD`. <br>
+         1. In _source/mqtt_main.h_ update the following macros: <br />
+            - Update the device ID in `MQTT_CLIENT_IDENTIFIER_AZURE_SAS`. <br />
+            - Update host name of the created IoT hub in `IOT_DEMO_SERVER_AZURE`. <br />
+            - Update device ID in `IOT_AZURE_USERNAME`. <br />
+            - Update the generated SAS token in `IOT_AZURE_PASSWORD`. <br />
 
          </details>
 
          </details>
 
-         <details><summary><b> Secure hardware </b></summary><br>
+         <details><summary><b> Secure hardware </b></summary><br />
 
          For secure hardware platforms like _CY8CKIT-064S0S2-4343W_, the SAS token can be used in the following 
          ways. Select either as per the use case.
 
-            <details><summary><b>Azure Device Provisioning Service (DPS)</b></summary><br>
+            <details><summary><b>Azure Device Provisioning Service (DPS)</b></summary><br />
 
             The following steps are used to generate the output of _**1. Azure Device Provisioning Service**_ menu option of this ModusToolbox&trade; application.
             Upon completing the following steps, the status of the provisioning is as shown in **Figure 8**.
@@ -534,15 +555,15 @@ This section describes the provisioning steps for this example and the setup of 
 
             1. In _source/azure_common.h_, set the `SAS_TOKEN_LOCATION_FLASH` macro as `false` to enable reading of device ID and SAS token from the secured element.
             
-            1. In _source/mqtt_main.h_, update the following macros: <br>
-               - Update the DPS registration ID in the `IOT_AZURE_DPS_REGISTRATION_ID` macro. <br>
-               - Update the ID scope value in the `IOT_AZURE_ID_SCOPE` macro. <br><br>
+            1. In _source/mqtt_main.h_, update the following macros: <br />
+               - Update the DPS registration ID in the `IOT_AZURE_DPS_REGISTRATION_ID` macro. <br />
+               - Update the ID scope value in the `IOT_AZURE_ID_SCOPE` macro. <br /><br />
 
             </details>
 
-            **OR**<br>
+            **OR**<br />
 
-            <details><summary><b>Without Azure Device Provisioning Service (DPS)</b></summary><br>
+            <details><summary><b>Without Azure Device Provisioning Service (DPS)</b></summary><br />
             
             The following steps are used to generate the output of _**2. Azure Device App (C2D, Telemetry, Methods, Twin)**_ and _**3. PnP (Plug and Play)**_ menu options of this ModusToolbox&trade; application.
 
@@ -552,7 +573,7 @@ This section describes the provisioning steps for this example and the setup of 
                
             1. In _source/azure_common.h_, set the `SAS_TOKEN_LOCATION_FLASH` macro as `false` to enable reading of device ID and SAS token from the secured element.
             
-            1. In _source/mqtt_main.h_, update the host name of the created IoT hub in `IOT_DEMO_SERVER_AZURE`. <br>
+            1. In _source/mqtt_main.h_, update the host name of the created IoT hub in `IOT_DEMO_SERVER_AZURE`. <br />
             
             1. Provision the _device ID_ and the _SAS token_ using the steps in [Authentication credentials setup](#authentication-credentials-setup) for secure hardware.
 
@@ -562,15 +583,15 @@ This section describes the provisioning steps for this example and the setup of 
 
       </details>
 
-      <details><summary><b>X509 certificate-based authentication mode</b></summary><br>
+      <details><summary><b>X509 certificate-based authentication mode</b></summary><br />
 
       1. Set the `SAS_TOKEN_AUTH` macro to `0` and `SAS_TOKEN_LOCATION_FLASH` to `false` in _source/azure_common.h_.
 
       2. Update the files as follows:
 
-         <details><summary><b> Non-secure hardware </b></summary> <br>
+         <details><summary><b> Non-secure hardware </b></summary> <br />
 
-            <details><summary><b>Azure Device Provisioning Service (DPS)</b></summary><br>
+            <details><summary><b>Azure Device Provisioning Service (DPS)</b></summary><br />
 
             The following steps are used to generate the output of _**1. Azure Device Provisioning Service**_ menu option of this ModusToolbox&trade; application.
             Upon completing the following steps, the status of the provisioning is as shown in **Figure 8**.
@@ -579,48 +600,48 @@ This section describes the provisioning steps for this example and the setup of 
          
             1. Refer to [Authentication credentials setup](#authentication-credentials-setup) for creating X509 certificates and _Individual Enrollment_ for Azure DPS.
 
-            1. In source/mqtt_main.h update the following macros: <br>
+            1. In source/mqtt_main.h update the following macros: <br />
 
-               - Update the DPS registration ID in the `IOT_AZURE_DPS_REGISTRATION_ID` macro. <br>
+               - Update the DPS registration ID in the `IOT_AZURE_DPS_REGISTRATION_ID` macro. <br />
                - Update the ID scope value in the `IOT_AZURE_ID_SCOPE` macro.
-               - Update the pem format value of certificates and keys in the `azure_root_ca_certificate`, `azure_client_cert`, and `azure_client_key` as mentioned in the [Authentication setup for Azure DPS](certificates/Authentication_Setup_Azure_DPS.md) section for non-secure kit. <br>
+               - Update the pem format value of certificates and keys in the `azure_root_ca_certificate`, `azure_client_cert`, and `azure_client_key` as mentioned in the [Authentication setup for Azure DPS](certificates/Authentication_Setup_Azure_DPS.md) section for non-secure kit. <br />
 
             </details>
             
-            **OR** <br>
+            **OR** <br />
             
-            <details><summary><b>Without Azure Device Provisioning Service (DPS)</b></summary> <br>
+            <details><summary><b>Without Azure Device Provisioning Service (DPS)</b></summary> <br />
 
             The following steps are used to generate the output of _**2. Azure Device App (C2D, Telemetry, Methods, Twin)**_ and _**3. PnP (Plug and Play)**_ menu options of this ModusToolbox&trade; application.
             Upon completing the following steps, the status of the provisioning is as shown in **Figure 8**.
 
             1. Create an X509 based device, it's a certificate and private key for Azure IoT Hub by referring to [Authentication credentials setup](#authentication-credentials-setup).
             
-            1. In _source/mqtt_main.h_ update the following macros: <br>
+            1. In _source/mqtt_main.h_ update the following macros: <br />
 
-               - Update the device ID in the `MQTT_CLIENT_IDENTIFIER_AZURE_CERT` macro. <br>
-               - Update host name of the created IoT hub in `IOT_DEMO_SERVER_AZURE`. <br>
-               - Update the device ID in the `IOT_AZURE_USERNAME` macro. <br>
-               - Update the pem format value of certificates and keys in the `azure_root_ca_certificate`, `azure_client_cert`, and `azure_client_key` as mentioned in the [Authentication credentials setup](#authentication-credentials-setup) section for non-secure kit. <br>
+               - Update the device ID in the `MQTT_CLIENT_IDENTIFIER_AZURE_CERT` macro. <br />
+               - Update host name of the created IoT hub in `IOT_DEMO_SERVER_AZURE`. <br />
+               - Update the device ID in the `IOT_AZURE_USERNAME` macro. <br />
+               - Update the pem format value of certificates and keys in the `azure_root_ca_certificate`, `azure_client_cert`, and `azure_client_key` as mentioned in the [Authentication credentials setup](#authentication-credentials-setup) section for non-secure kit. <br />
 
             </details>
 
          </details>
 
-         <details><summary><b>Secure hardware</b></summary> <br>
+         <details><summary><b>Secure hardware</b></summary> <br />
 
-           <details><summary><b>Azure Device Provisioning Service (DPS)</b></summary><br>
+           <details><summary><b>Azure Device Provisioning Service (DPS)</b></summary><br />
             
             The following steps are used to generate the output of _**1. Azure Device Provisioning Service**_ menu option of this ModusToolbox&trade; application.
             Upon completing the following steps, the status of the provisioning is as shown in **Figure 8**.
            
             1. Create a _DPS_ by referring to the [quick DPS setup](https://docs.microsoft.com/en-us/azure/iot-dps/quick-setup-auto-provision?view=iotedge-2020-11).
 
-            1. Refer to [Authentication credentials setup](#authentication-credentials-setup) for creating X509 certificates and _Individual Enrollment_ for Azure DPS. Certificates will be read from the secured memory during a TLS connection with Azure. <br>
+            1. Refer to [Authentication credentials setup](#authentication-credentials-setup) for creating X509 certificates and _Individual Enrollment_ for Azure DPS. Certificates will be read from the secured memory during a TLS connection with Azure. <br />
             
-            1. In _source/mqtt_main.h_, update the following macros: <br>
-               - Update the DPS registration ID in the `IOT_AZURE_DPS_REGISTRATION_ID` macro. <br>
-               - Update the ID scope value in the `IOT_AZURE_ID_SCOPE` macro. <br> <br>
+            1. In _source/mqtt_main.h_, update the following macros: <br />
+               - Update the DPS registration ID in the `IOT_AZURE_DPS_REGISTRATION_ID` macro. <br />
+               - Update the ID scope value in the `IOT_AZURE_ID_SCOPE` macro. <br /> <br />
             
             In _CY8CKIT-064S0S2-4343W_ kit example, [FreeRTOS PSA PKCS11](https://github.com/Linaro/freertos-pkcs11-psa/) implementation supports only SHA-256 hashing algorithm. So the application should choose the cipher suite list compatible with the SHA-256. To choose the cipher suite list, the application needs to add required cipher suites to the `MBEDTLS_SSL_CIPHERSUITES` macro in _configs/mbedtls_user_config.h_ file. The sample _configs/mbedtls_user_config.h_ file includes `MBEDTLS_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256` and `MBEDTLS_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256` cipher suites to communicate with the Azure broker.
 
@@ -635,21 +656,21 @@ This section describes the provisioning steps for this example and the setup of 
 
             </details>
 
-            **OR** <br>
+            **OR** <br />
 
-            <details><summary><b>Without Azure Device Provisioning Service (DPS)</b></summary><br>
+            <details><summary><b>Without Azure Device Provisioning Service (DPS)</b></summary><br />
 
             The following steps are used to generate the output of _**2. Azure Device App (C2D, Telemetry, Methods, Twin)**_ and _**3. PnP (Plug and Play)**_ menu options of this ModusToolbox&trade; application.
             Upon completing the following steps, the status of the provisioning is as shown in **Figure 8**.
 
             1. Create an X509 based device, it's a certificate and private key for the Azure IoT Hub by referring to [Authentication credentials setup](#authentication-credentials-setup).
 
-            1. In source/mqtt_main.h update the following macros: <br>
-               - Update the device ID in the `MQTT_CLIENT_IDENTIFIER_AZURE_CERT` macro. <br>
-               - Update host name of the created IoT hub in the `IOT_DEMO_SERVER_AZURE` macro. <br>
-               - Update the device ID in the `IOT_AZURE_USERNAME` macro. <br> <br>
+            1. In source/mqtt_main.h update the following macros: <br />
+               - Update the device ID in the `MQTT_CLIENT_IDENTIFIER_AZURE_CERT` macro. <br />
+               - Update host name of the created IoT hub in the `IOT_DEMO_SERVER_AZURE` macro. <br />
+               - Update the device ID in the `IOT_AZURE_USERNAME` macro. <br /> <br />
                
-            The certificates and keys must be generated and provisioned as mentioned in the [Authentication credentials setup](#authentication-credentials-setup) section for the secure kit. Certificates and keys will be read from the secured memory during a TLS connection. <br>
+            The certificates and keys must be generated and provisioned as mentioned in the [Authentication credentials setup](#authentication-credentials-setup) section for the secure kit. Certificates and keys will be read from the secured memory during a TLS connection. <br />
             
             In _CY8CKIT-064S0S2-4343W_ kit example, [FreeRTOS PSA PKCS11](https://github.com/Linaro/freertos-pkcs11-psa/) implementation supports only SHA-256 hashing algorithm. So the application should choose the cipher suite list compatible with the SHA-256. To choose the cipher suite list, the application needs to add required cipher suites to the `MBEDTLS_SSL_CIPHERSUITES` macro in _configs/mbedtls_user_config.h_ file. The sample _configs/mbedtls_user_config.h_ file includes `MBEDTLS_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256` and `MBEDTLS_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256` cipher suites to communicate with the Azure broker.
 
@@ -676,7 +697,7 @@ This section describes the provisioning steps for this example and the setup of 
 6. Program the board using one of the following:
 
    <details><summary><b>Using Eclipse IDE for ModusToolbox&trade; software</b></summary>
-   <br>
+   <br />
 
       1. Select the application project in the Project Explorer.
 
@@ -684,7 +705,7 @@ This section describes the provisioning steps for this example and the setup of 
    </details>
 
    <details><summary><b>Using CLI</b></summary>
-   <br>
+   <br />
 
      From the terminal, execute the `make program` command to build and program the application using the default toolchain to the default target. The default toolchain and target are specified in the application's Makefile but you can override those values manually:
       ```
@@ -893,27 +914,27 @@ All the scripts needed for this example are placed under the _/scripts_ director
  SDIO (HAL)|sdio_obj|SDIO interface for Wi-Fi connectivity.
  UART (HAL)|cy_retarget_io_uart_obj| UART HAL object used by Retarget-IO for the debug UART port.
 
-<br>
+<br />
 
 ## Related resources
 
 Resources  | Links
 -----------|----------------------------------
-Application notes  | [AN228571](https://www.infineon.com/dgdl/Infineon-AN228571_Getting_started_with_PSoC_6_MCU_on_ModusToolbox_software-ApplicationNotes-v06_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0d36de1f66d1&utm_source=cypress&utm_medium=referral&utm_campaign=202110_globe_en_all_integration-application_note) – Getting started with PSoC&trade; 6 MCU on ModusToolbox&trade; software <br>  [AN215656](https://www.infineon.com/dgdl/Infineon-AN215656_PSoC_6_MCU_Dual-CPU_System_Design-ApplicationNotes-v09_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0d3180c4655f&utm_source=cypress&utm_medium=referral&utm_campaign=202110_globe_en_all_integration-application_note) – PSoC&trade; 6 MCU: Dual-CPU system design <br> 
-Code examples  | [Using ModusToolbox&trade; software](https://github.com/Infineon/Code-Examples-for-ModusToolbox-Software) on GitHub <br>
-Device documentation | [PSoC&trade; 6 MCU datasheets](https://www.infineon.com/cms/en/search.html#!view=downloads&term=PSoC%206&doc_group=Data%20Sheet) <br> [PSoC&trade; 6 technical reference manuals](https://www.infineon.com/cms/en/search.html#!view=downloads&term=PSoC%206&doc_group=Additional%20Technical%20Information)
+Application notes  | [AN228571](https://www.infineon.com/dgdl/Infineon-AN228571_Getting_started_with_PSoC_6_MCU_on_ModusToolbox_software-ApplicationNotes-v06_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0d36de1f66d1&utm_source=cypress&utm_medium=referral&utm_campaign=202110_globe_en_all_integration-application_note) – Getting started with PSoC&trade; 6 MCU on ModusToolbox&trade; software <br />  [AN215656](https://www.infineon.com/dgdl/Infineon-AN215656_PSoC_6_MCU_Dual-CPU_System_Design-ApplicationNotes-v09_00-EN.pdf?fileId=8ac78c8c7cdc391c017d0d3180c4655f&utm_source=cypress&utm_medium=referral&utm_campaign=202110_globe_en_all_integration-application_note) – PSoC&trade; 6 MCU: Dual-CPU system design <br /> 
+Code examples  | [Using ModusToolbox&trade; software](https://github.com/Infineon/Code-Examples-for-ModusToolbox-Software) on GitHub <br />
+Device documentation | [PSoC&trade; 6 MCU datasheets](https://www.infineon.com/cms/en/search.html#!view=downloads&term=PSoC%206&doc_group=Data%20Sheet) <br /> [PSoC&trade; 6 technical reference manuals](https://www.infineon.com/cms/en/search.html#!view=downloads&term=PSoC%206&doc_group=Additional%20Technical%20Information)
 Development kits |Select your kits from the [Evaluation board finder](https://www.infineon.com/cms/en/design-support/finder-selection-tools/product-finder/evaluation-board) page
-Libraries on GitHub  | [mtb-pdl-cat1](https://github.com/Infineon/mtb-pdl-cat1) – PSoC&trade; 6 peripheral driver library (PDL)  <br> [mtb-hal-cat1](https://github.com/Infineon/mtb-hal-cat1) – Hardware abstraction layer (HAL) library <br> [retarget-io](https://github.com/Infineon/retarget-io) – Utility library to retarget STDIO messages to a UART port <br>
-Middleware on GitHub  | [psoc6-middleware](https://github.com/Infineon/modustoolbox-software#psoc-6-middleware-libraries) – Links to all PSoC&trade; 6 MCU middleware <br> [mqtt](https://github.com/Infineon/mqtt) – MQTT client library and documents <br> [wifi-connection-manager](https://github.com/Infineon/wifi-connection-manager) – Wi-Fi connection manager (WCM) library and documents <br> [wifi-mw-core](https://github.com/Infineon/wifi-mw-core) – Wi-Fi middleware core library and documents <br> [freeRTOS](https://github.com/Infineon/freertos) – FreeRTOS library and documents 
-Tools  | [Eclipse IDE for ModusToolbox&trade; software](https://www.cypress.com/modustoolbox) – ModusToolbox&trade; software is a collection of easy-to-use software and tools enabling rapid development with Infineon MCUs, covering applications from embedded sense and control to wireless and cloud-connected systems using AIROC&trade; Wi-Fi and Bluetooth® connectivity devices.
+Libraries on GitHub  | [mtb-pdl-cat1](https://github.com/Infineon/mtb-pdl-cat1) – PSoC&trade; 6 peripheral driver library (PDL)  <br /> [mtb-hal-cat1](https://github.com/Infineon/mtb-hal-cat1) – Hardware abstraction layer (HAL) library <br /> [retarget-io](https://github.com/Infineon/retarget-io) – Utility library to retarget STDIO messages to a UART port <br />
+Middleware on GitHub  | [psoc6-middleware](https://github.com/Infineon/modustoolbox-software#psoc-6-middleware-libraries) – Links to all PSoC&trade; 6 MCU middleware <br /> [mqtt](https://github.com/Infineon/mqtt) – MQTT client library and documents <br /> [wifi-connection-manager](https://github.com/Infineon/wifi-connection-manager) – Wi-Fi connection manager (WCM) library and documents <br /> [wifi-mw-core](https://github.com/Infineon/wifi-mw-core) – Wi-Fi middleware core library and documents <br /> [freeRTOS](https://github.com/Infineon/freertos) – FreeRTOS library and documents 
+Tools  | [Eclipse IDE for ModusToolbox&trade; software](https://www.infineon.com/modustoolbox) – ModusToolbox&trade; software is a collection of easy-to-use software and tools enabling rapid development with Infineon MCUs, covering applications from embedded sense and control to wireless and cloud-connected systems using AIROC&trade; Wi-Fi and Bluetooth® connectivity devices. <br /> [PSoC&trade; Creator](https://www.infineon.com/cms/en/design-support/tools/sdk/psoc-software/psoc-creator/) – IDE for PSoC&trade; and FM0+ MCU development
 
-<br>
+<br />
 
 ## Other resources
 
 Infineon provides a wealth of data at www.infineon.com to help you select the right device, and quickly and effectively integrate it into your design.
 
-For PSoC&trade; 6 MCU devices, see [How to design with PSoC&trade; 6 MCU - KBA223067](https://community.infineon.com/t5/Knowledge-Base-Articles/How-to-Design-with-PSoC-6-MCU-KBA223067/ta-p/248857) in the Infineon community.
+For PSoC&trade; 6 MCU devices, see [How to design with PSoC&trade; 6 MCU - KBA223067](https://community.infineon.com/docs/DOC-14644) in the Infineon Developer community.
 
 
 ## Document history
@@ -925,13 +946,14 @@ Document title: *CE234014* – *Connecting to Azure IoT services using Azure SDK
  1.0.0   | New code example
  2.0.0   | Updated steps for X509 based Azure DPS and combined Azure IoT hub features
  2.1.0   | Minor bug fixes and updated dependencies packages
+ 3.0.0	 | Major update to support ModusToolbox&trade; software v3.0. <br /> This version is not backward compatible with previous versions of ModusToolbox&trade;.	
 
-<br>
+<br />
 
 ---------------------------------------------------------
 
-© Cypress Semiconductor Corporation, 2021-2022. This document is the property of Cypress Semiconductor Corporation, an Infineon Technologies company, and its affiliates ("Cypress").  This document, including any software or firmware included or referenced in this document ("Software"), is owned by Cypress under the intellectual property laws and treaties of the United States and other countries worldwide.  Cypress reserves all rights under such laws and treaties and does not, except as specifically stated in this paragraph, grant any license under its patents, copyrights, trademarks, or other intellectual property rights.  If the Software is not accompanied by a license agreement and you do not otherwise have a written agreement with Cypress governing the use of the Software, then Cypress hereby grants you a personal, non-exclusive, nontransferable license (without the right to sublicense) (1) under its copyright rights in the Software (a) for Software provided in source code form, to modify and reproduce the Software solely for use with Cypress hardware products, only internally within your organization, and (b) to distribute the Software in binary code form externally to end users (either directly or indirectly through resellers and distributors), solely for use on Cypress hardware product units, and (2) under those claims of Cypress’s patents that are infringed by the Software (as provided by Cypress, unmodified) to make, use, distribute, and import the Software solely for use with Cypress hardware products.  Any other use, reproduction, modification, translation, or compilation of the Software is prohibited.
-<br>
+© Cypress Semiconductor Corporation, 2020-2022. This document is the property of Cypress Semiconductor Corporation, an Infineon Technologies company, and its affiliates ("Cypress").  This document, including any software or firmware included or referenced in this document ("Software"), is owned by Cypress under the intellectual property laws and treaties of the United States and other countries worldwide.  Cypress reserves all rights under such laws and treaties and does not, except as specifically stated in this paragraph, grant any license under its patents, copyrights, trademarks, or other intellectual property rights.  If the Software is not accompanied by a license agreement and you do not otherwise have a written agreement with Cypress governing the use of the Software, then Cypress hereby grants you a personal, non-exclusive, nontransferable license (without the right to sublicense) (1) under its copyright rights in the Software (a) for Software provided in source code form, to modify and reproduce the Software solely for use with Cypress hardware products, only internally within your organization, and (b) to distribute the Software in binary code form externally to end users (either directly or indirectly through resellers and distributors), solely for use on Cypress hardware product units, and (2) under those claims of Cypress’s patents that are infringed by the Software (as provided by Cypress, unmodified) to make, use, distribute, and import the Software solely for use with Cypress hardware products.  Any other use, reproduction, modification, translation, or compilation of the Software is prohibited.
+<br />
 TO THE EXTENT PERMITTED BY APPLICABLE LAW, CYPRESS MAKES NO WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, WITH REGARD TO THIS DOCUMENT OR ANY SOFTWARE OR ACCOMPANYING HARDWARE, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  No computing device can be absolutely secure.  Therefore, despite security measures implemented in Cypress hardware or software products, Cypress shall have no liability arising out of any security breach, such as unauthorized access to or use of a Cypress product. CYPRESS DOES NOT REPRESENT, WARRANT, OR GUARANTEE THAT CYPRESS PRODUCTS, OR SYSTEMS CREATED USING CYPRESS PRODUCTS, WILL BE FREE FROM CORRUPTION, ATTACK, VIRUSES, INTERFERENCE, HACKING, DATA LOSS OR THEFT, OR OTHER SECURITY INTRUSION (collectively, "Security Breach").  Cypress disclaims any liability relating to any Security Breach, and you shall and hereby do release Cypress from any claim, damage, or other liability arising from any Security Breach.  In addition, the products described in these materials may contain design defects or errors known as errata which may cause the product to deviate from published specifications. To the extent permitted by applicable law, Cypress reserves the right to make changes to this document without further notice. Cypress does not assume any liability arising out of the application or use of any product or circuit described in this document. Any information provided in this document, including any sample design information or programming code, is provided only for reference purposes.  It is the responsibility of the user of this document to properly design, program, and test the functionality and safety of any application made of this information and any resulting product.  "High-Risk Device" means any device or system whose failure could cause personal injury, death, or property damage.  Examples of High-Risk Devices are weapons, nuclear installations, surgical implants, and other medical devices.  "Critical Component" means any component of a High-Risk Device whose failure to perform can be reasonably expected to cause, directly or indirectly, the failure of the High-Risk Device, or to affect its safety or effectiveness.  Cypress is not liable, in whole or in part, and you shall and hereby do release Cypress from any claim, damage, or other liability arising from any use of a Cypress product as a Critical Component in a High-Risk Device. You shall indemnify and hold Cypress, including its affiliates, and its directors, officers, employees, agents, distributors, and assigns harmless from and against all claims, costs, damages, and expenses, arising out of any claim, including claims for product liability, personal injury or death, or property damage arising from any use of a Cypress product as a Critical Component in a High-Risk Device. Cypress products are not intended or authorized for use as a Critical Component in any High-Risk Device except to the limited extent that (i) Cypress’s published data sheet for the product explicitly states Cypress has qualified the product for use in a specific High-Risk Device, or (ii) Cypress has given you advance written authorization to use the product as a Critical Component in the specific High-Risk Device and you have signed a separate indemnification agreement.
-<br>
+<br />
 Cypress, the Cypress logo, and combinations thereof, WICED, ModusToolbox, PSoC, CapSense, EZ-USB, F-RAM, and Traveo are trademarks or registered trademarks of Cypress or a subsidiary of Cypress in the United States or in other countries. For a more complete list of Cypress trademarks, visit cypress.com. Other names and brands may be claimed as property of their respective owners.

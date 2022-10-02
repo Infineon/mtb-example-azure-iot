@@ -7,3 +7,12 @@ $(SEARCH_azure-sdk-for-c)/sdk/samples
 $(SEARCH_azure-sdk-for-c)/sdk/tests
 $(SEARCH_azure-sdk-for-c)/sdk/docs
 
+# Documentation
+images
+
+# Exports, Project settings
+.mtbLaunchConfigs
+.settings
+.vscode
+
+
