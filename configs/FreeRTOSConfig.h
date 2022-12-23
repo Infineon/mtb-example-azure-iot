@@ -206,10 +206,10 @@ standard names - or at least those used in the unmodified vector table. */
 
 /* Enable low power tickless functionality. The RTOS abstraction library
  * provides the compatible implementation of the vApplicationSleep hook:
- * https://github.com/cypresssemiconductorco/abstraction-rtos#freertos
+ * https://github.com/Infineon/abstraction-rtos#freertos
  * The Low Power Assistant library provides additional portable configuration layer
  * for low-power features supported by the PSoC 6 devices:
- * https://github.com/cypresssemiconductorco/lpa
+ * https://github.com/Infineon/lpa
  */
 extern void vApplicationSleep( uint32_t xExpectedIdleTime );
 #define portSUPPRESS_TICKS_AND_SLEEP( xIdleTime ) vApplicationSleep( xIdleTime )
@@ -219,8 +219,8 @@ extern void vApplicationSleep( uint32_t xExpectedIdleTime );
 #define configUSE_TICKLESS_IDLE                 0
 #endif
 
-/* Deep Sleep Latency Configuration */
-#if defined (TARGET_CY8CKIT_064S0S2_4343W) && defined (DEBUG)
+/* Deep Sleep Latency Configuration for secure Kit */
+#if defined (CY_TFM_PSA_SUPPORTED) && defined (DEBUG)
 #undef CY_CFG_PWR_DEEPSLEEP_LATENCY
 #define CY_CFG_PWR_DEEPSLEEP_LATENCY            100UL
 #endif
@@ -229,13 +229,13 @@ extern void vApplicationSleep( uint32_t xExpectedIdleTime );
 #define configEXPECTED_IDLE_TIME_BEFORE_SLEEP   CY_CFG_PWR_DEEPSLEEP_LATENCY
 #endif
 
-/* Allocate newlib reeentrancy structures for each RTOS task.
+/* Allocate newlib re-entrancy structures for each RTOS task.
  * The system behavior is toolchain-specific.
  *
  * GCC toolchain: the application must provide the implementation for the required
  * newlib hook functions: __malloc_lock, __malloc_unlock, __env_lock, __env_unlock.
  * FreeRTOS-compatible implementation is provided by the clib-support library:
- * https://github.com/cypresssemiconductorco/clib-support
+ * https://github.com/Infineon/clib-support
  *
  * ARM/IAR toolchains: the application must provide the reent.h header to adapt
  * FreeRTOS's configUSE_NEWLIB_REENTRANT to work with the toolchain-specific C library.

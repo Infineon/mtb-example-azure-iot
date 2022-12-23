@@ -52,6 +52,11 @@
 
 /* Wi-Fi connection manager header files. */
 #include "cy_wcm.h"
+#include "cy_wcm_error.h"
+
+/* IP address related header files (part of the lwIP TCP/IP stack). */
+#include "ip_addr.h"
+
 
 /* IoT SDK, Secure Sockets, and MQTT initialization */
 #include "cy_tcpip_port_secure_sockets.h"
@@ -108,12 +113,29 @@ cy_rslt_t connect_to_wifi_ap(void)
     {
         result = cy_wcm_connect_ap( &wifi_conn_param, &ip_address );
 
-        if (result == CY_RSLT_SUCCESS)
+        if(result == CY_RSLT_SUCCESS)
         {
-            printf( "\r\nSuccessfully connected to Wi-Fi network '%s'.\r\n",
-                    wifi_conn_param.ap_credentials.SSID);
+            printf("Successfully connected to Wi-Fi network '%s'.\n",
+                                wifi_conn_param.ap_credentials.SSID);
+
+            #if(USE_IPV6_ADDRESS)
+            /* Get the IPv6 address.*/
+                result = cy_wcm_get_ipv6_addr(CY_WCM_INTERFACE_TYPE_STA,
+                                              CY_WCM_IPV6_LINK_LOCAL, &ip_address);
+                if(result == CY_RSLT_SUCCESS)
+                {
+                    printf("IPv6 address (link-local) assigned: %s\n",
+                            ip6addr_ntoa((const ip6_addr_t*)&ip_address.ip.v6));
+                }
+            #else
+                printf("IPv4 address assigned: %s\n",
+                        ip4addr_ntoa((const ip4_addr_t*)&ip_address.ip.v4));
+
+            #endif /* USE_IPV6_ADDRESS */
+
             return result;
         }
+
 
         printf( "\r\nConnection to Wi-Fi network failed with error code %d."
                 "Retrying in %d ms...\n", (int) result, WIFI_CONN_RETRY_DELAY_MS );
