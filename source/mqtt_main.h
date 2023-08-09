@@ -5,7 +5,7 @@
  * Azure App.
  *
  ********************************************************************************
- * Copyright 2022, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2022-2023, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
@@ -44,7 +44,9 @@
  * Macros
  ********************************************************************************/
 
-/* Macro for Wi-Fi connection */
+/* Wi-Fi Credentials: Modify WIFI_SSID and WIFI_PASSWORD to match your Wi-Fi network
+ * Credentials.
+ */
 /* Wi-Fi SSID */
 #define WIFI_SSID                               "Replace this string by WiFi SSID"
 /* Wi-Fi PASSWORD */
@@ -58,10 +60,15 @@
 
 #define MAX_WIFI_RETRY_COUNT                    ( 3 )
 
-/* MQTT client identifier for Azure broker */
-/* Unique Device identifier, used only with SAS Authentication*/
+/* Modify the MQTT client identifiers for Azure broker from azure account */
+
+/* Unique Device identifier, used only with SAS Authentication 
+ * Device identity used for device authentication and access control
+*/
 #define MQTT_CLIENT_IDENTIFIER_AZURE_SAS        "Replace this string by device ID generated from Azure cloud"
-/* Unique Device identifier, used only with X509 Authentication */
+/* Unique Device identifier, used only with X509 Authentication,
+ * Device identitifier used for device authentication and access control
+*/
 #define MQTT_CLIENT_IDENTIFIER_AZURE_CERT       "Replace this string by device ID generated from Azure cloud"
 
 /*
@@ -92,13 +99,15 @@
 #define IOT_AZURE_USERNAME                      IOT_DEMO_SERVER_AZURE "/" "<dev_ID>" "/?api-version=2018-06-30"
 #define IOT_AZURE_USERNAME_LENGTH               ( ( uint16_t ) ( sizeof( IOT_AZURE_USERNAME ) - 1 ) )
 
-/* Update the SAS token, Example: "SharedAccessSignature sr= ... 5560" */
+/* Update the Generated SAS Token for Device in Azure IoT Hub, Example: "SharedAccessSignature sr= ... 5560" */
 #define IOT_AZURE_PASSWORD                      "Replace this string by generated SAS token."
 #define IOT_AZURE_PASSWORD_LENGTH                ( ( uint16_t ) ( sizeof( IOT_AZURE_PASSWORD ) - 1 ) )
 
 /* For DPS application */
+/* Replace this string by generated registration ID from Azure portal for DPS*/
 #define IOT_AZURE_DPS_REGISTRATION_ID           "Replace this string by generated registration ID from Azure portal for DPS"
 #define IOT_AZURE_DPS_REGISTRATION_ID_LEN       ( ( uint16_t ) ( sizeof( IOT_AZURE_DPS_REGISTRATION_ID ) - 1 ) )
+/* Replace this string by generated ID Scope from Azure portal for DPS Ex:0ne00****** */
 #define IOT_AZURE_ID_SCOPE                      "Replace this string by generated ID scope from Azure portal for DPS"
 #define IOT_AZURE_ID_SCOPE_LEN                  ( ( uint16_t ) ( sizeof( IOT_AZURE_ID_SCOPE ) - 1 ) )
 
