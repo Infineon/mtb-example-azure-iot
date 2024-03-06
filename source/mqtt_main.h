@@ -5,7 +5,7 @@
  * Azure App.
  *
  ********************************************************************************
- * Copyright 2022-2023, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2022-2024, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
