@@ -85,7 +85,7 @@ VERBOSE=
 # ... then code in directories named COMPONENT_foo and COMPONENT_bar will be
 # added to the build
 #
-COMPONENTS+=FREERTOS MBEDTLS LWIP SECURE_SOCKETS
+COMPONENTS=FREERTOS MBEDTLS LWIP SECURE_SOCKETS
 
 # Like COMPONENTS, but disable optional code that was enabled by default.
 DISABLE_COMPONENTS=
@@ -101,32 +101,32 @@ SOURCES=
 INCLUDES=./configs
 
 # Custom configuration of mbedtls library.
-MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"configs/mbedtls_user_config.h"'
+MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"mbedtls_user_config.h"'
 
 # Add additional defines to the build process (without a leading -D).
-DEFINES=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RTOS_AWARE CY_RETARGET_IO_CONVERT_LF_TO_CRLF ENABLE_MQTT_LOGS
+DEFINES=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RTOS_AWARE CY_RETARGET_IO_CONVERT_LF_TO_CRLF
 
 # CY8CPROTO-062-4343W board shares the same GPIO for the user button (USER BTN1)
-# and the CYW4343W host wake up pin. Since this example uses the GPIO for  
+# and the CYW4343W host wake up pin. Since this example uses the GPIO for
 # interfacing with the user button, the SDIO interrupt to wake up the host is
 # disabled by setting CY_WIFI_HOST_WAKE_SW_FORCE to '0'.
-# 
-# If you wish to enable this host wake up feature, Comment the below DEFINES line. 
-# If you want this feature on CY8CPROTO-062-4343W, change the GPIO pin for USER BTN 
+#
+# If you wish to enable this host wake up feature, Comment the below DEFINES line.
+# If you want this feature on CY8CPROTO-062-4343W, change the GPIO pin for USER BTN
 # in design/hardware & Comment the below DEFINES line.
 DEFINES+=CY_WIFI_HOST_WAKE_SW_FORCE=0
 
-DEFINES += HTTP_USER_AGENT_VALUE="\"anycloud-http-client\""
+DEFINES+=HTTP_USER_AGENT_VALUE="\"anycloud-http-client\""
 
 # Disable custom mqtt config header file
-DEFINES += MQTT_DO_NOT_USE_CUSTOM_CONFIG
-DEFINES += HTTP_DO_NOT_USE_CUSTOM_CONFIG
+DEFINES+=MQTT_DO_NOT_USE_CUSTOM_CONFIG
+DEFINES+=HTTP_DO_NOT_USE_CUSTOM_CONFIG
 
 #  To disable the main.c for enabling the compilation of mqtt_iot_sas_token_provision.c
-#CY_IGNORE += ./source/main.c
+#CY_IGNORE+=./source/main.c
 
 # To disable the mqtt_iot_sas_token_provision.c for enabling the compilation of main.c
-CY_IGNORE += ./source/mqtt_iot_sas_token_provision.c
+CY_IGNORE+=./source/mqtt_iot_sas_token_provision.c
 
 # Select softfp or hardfp floating point. Default is softfp.
 VFP_SELECT=
@@ -220,7 +220,7 @@ endif
 $(info Tools Directory: $(CY_TOOLS_DIR))
 
 # Defines and includes for a TFM enabled kit
-DEFINES+=$(if $(filter TFM_S_FW,$(BSP_COMPONENTS)),CY_TFM_PSA_SUPPORTED CY_SECURE_SOCKETS_PKCS_SUPPORT)
+DEFINES+=$(if $(filter TFM_S_FW,$(BSP_COMPONENTS)),CY_TFM_PSA_SUPPORTED TFM_MULTI_CORE_NS_OS CY_SECURE_SOCKETS_PKCS_SUPPORT)
 CY_SECURE_POLICY_NAME=$(if $(filter TFM_S_FW,$(BSP_COMPONENTS)),policy_multi_CM0_CM4_tfm_dev_certs)
 INCLUDES+=$(if $(filter TFM_S_FW,$(BSP_COMPONENTS)),$(SEARCH_trusted-firmware-m)/COMPONENT_TFM_NS_INTERFACE/include)
 

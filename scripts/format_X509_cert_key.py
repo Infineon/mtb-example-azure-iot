@@ -29,5 +29,5 @@ if __name__ == '__main__':
         else:
             if (arg.endswith(".py") == False):
                 print("Pass file with extension (*.crt) (*.pem) or (*.key) only!")
-            
+
     input("Enter any key to exit...")

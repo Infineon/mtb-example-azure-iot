@@ -1,12 +1,3 @@
-$(SEARCH_azure-sdk-for-c)/cmake-modules
-$(SEARCH_azure-sdk-for-c)/eng
-$(SEARCH_azure-sdk-for-c)/samples
-$(SEARCH_azure-sdk-for-c)/tests
-$(SEARCH_azure-sdk-for-c)/sdk/src/azure/platform
-$(SEARCH_azure-sdk-for-c)/sdk/samples
-$(SEARCH_azure-sdk-for-c)/sdk/tests
-$(SEARCH_azure-sdk-for-c)/sdk/docs
-
 # Documentation
 images
 
@@ -15,4 +6,12 @@ images
 .settings
 .vscode
 
-
+# Below folder are not needed for this CE
+$(SEARCH_azure-sdk-for-c)/cmake-modules
+$(SEARCH_azure-sdk-for-c)/eng
+$(SEARCH_azure-sdk-for-c)/samples
+$(SEARCH_azure-sdk-for-c)/tests
+$(SEARCH_azure-sdk-for-c)/sdk/src/azure/platform
+$(SEARCH_azure-sdk-for-c)/sdk/samples
+$(SEARCH_azure-sdk-for-c)/sdk/tests
+$(SEARCH_azure-sdk-for-c)/sdk/docs

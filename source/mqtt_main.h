@@ -62,12 +62,12 @@
 
 /* Modify the MQTT client identifiers for Azure broker from azure account */
 
-/* Unique Device identifier, used only with SAS Authentication 
+/* Unique Device identifier, used only with SAS Authentication
  * Device identity used for device authentication and access control
 */
 #define MQTT_CLIENT_IDENTIFIER_AZURE_SAS        "Replace this string by device ID generated from Azure cloud"
 /* Unique Device identifier, used only with X509 Authentication,
- * Device identitifier used for device authentication and access control
+ * Device identifier used for device authentication and access control
 */
 #define MQTT_CLIENT_IDENTIFIER_AZURE_CERT       "Replace this string by device ID generated from Azure cloud"
 
@@ -85,18 +85,16 @@
 
 /* Azure Server endpoints used for the demos */
 /* "Replace this string by generated IoT Host name from Azure cloud".
- * Example: my-azure-hubname.azure-devices.net */
+ * Example: my-azure-hub.azure-devices.net */
 #define IOT_DEMO_SERVER_AZURE                   "<hub_name>.azure-devices.net"
 #define IOT_DEMO_PORT_AZURE_S                   ( 8883 )
 
 /*
- * The following user name is generated using the Azure C SDK API.
+ * The following username is generated using the Azure C SDK API.
  * The following macro will be used in case of direct connection
  * (without Azure SDK).
  */
-/* Update the hub and device name in the string. */
-/* Example: IOT_DEMO_SERVER_AZURE "/" "my_azure_dev1" "/?api-version=2018-06-30" */
-#define IOT_AZURE_USERNAME                      IOT_DEMO_SERVER_AZURE "/" "<dev_ID>" "/?api-version=2018-06-30"
+#define IOT_AZURE_USERNAME                      IOT_DEMO_SERVER_AZURE "/" MQTT_CLIENT_IDENTIFIER_AZURE_CERT "/?api-version=2021-04-12"
 #define IOT_AZURE_USERNAME_LENGTH               ( ( uint16_t ) ( sizeof( IOT_AZURE_USERNAME ) - 1 ) )
 
 /* Update the Generated SAS Token for Device in Azure IoT Hub, Example: "SharedAccessSignature sr= ... 5560" */

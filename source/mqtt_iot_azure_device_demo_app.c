@@ -121,6 +121,9 @@
 
 #define HUB_DIRECT_METHOD_EVENT_QUEUE_LENGTH        (10)
 
+/*String that describes the MQTT handle that is being created in order to uniquely identify it*/
+#define MQTT_HANDLE_DESCRIPTOR                      "MQTThandleID"
+
 /***********************************************************
  * Constants
  ************************************************************/
@@ -1163,8 +1166,7 @@ static cy_rslt_t create_and_configure_mqtt_client(void)
 
     result = cy_mqtt_create( buffer, NETWORK_BUFFER_SIZE,
             security, &broker_info,
-            (cy_mqtt_callback_t)mqtt_event_cb, NULL,
-            &mqtthandle );
+            MQTT_HANDLE_DESCRIPTOR, &mqtthandle );
     if( result == TEST_PASS )
     {
         TEST_INFO(( "cy_mqtt_create ----------------------------- Pass \n" ));
@@ -1175,7 +1177,10 @@ static cy_rslt_t create_and_configure_mqtt_client(void)
         return TEST_FAIL;
     }
 
-    return CY_RSLT_SUCCESS;
+    result = cy_mqtt_register_event_callback(mqtthandle,
+    (cy_mqtt_callback_t)mqtt_event_cb, NULL);
+
+    return result;
 }
 
 /******************************************************************************

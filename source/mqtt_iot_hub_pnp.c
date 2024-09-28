@@ -97,6 +97,9 @@
 
 #define PNP_MSG_EVENT_QUEUE_LENGTH                  (10)
 
+/*String that describes the MQTT handle that is being created in order to uniquely identify it*/
+#define MQTT_HANDLE_DESCRIPTOR                      "MQTThandleID"
+
 /************************************************************
  * Static Variables
  ************************************************************/
@@ -517,14 +520,14 @@ static void handle_command_request(cy_mqtt_publish_info_t *message,
         memcpy(&(msg_event->command_response_payload), &command_empty_response_payload, sizeof(az_span));
     }
 
-    TEST_INFO(("Pushing to PNP message(device_command_request) event queue...\n"));
+    TEST_INFO(("Pushing to PNP message (device_command_request) event queue...\n"));
     if( xQueueSend( pnp_msg_event_queue, (void *)&msg_event, pdMS_TO_TICKS(PNP_MSG_EVENT_QUEUE_MSEC) ) != pdPASS )
     {
         TEST_INFO(("Pushing to PNP message event queue failed\n"));
         free(msg_event);
         return;
     }
-    TEST_INFO(("Message(device_command_request) queued to PNP message event queue...\n"));
+    TEST_INFO(("Message (device_command_request) queued to PNP message event queue...\n"));
 }
 
 /******************************************************************************
@@ -1529,8 +1532,7 @@ static cy_rslt_t create_and_configure_mqtt_client(void)
 
     result = cy_mqtt_create(buffer, NETWORK_BUFFER_SIZE,
             security, &broker_info,
-            (cy_mqtt_callback_t)mqtt_event_cb, NULL,
-            &mqtthandle);
+            MQTT_HANDLE_DESCRIPTOR, &mqtthandle);
     if(result == TEST_PASS)
     {
         TEST_INFO(("\r\ncy_mqtt_create ----------------------------- Pass \n"));
@@ -1541,7 +1543,10 @@ static cy_rslt_t create_and_configure_mqtt_client(void)
         return TEST_FAIL;
     }
 
-    return CY_RSLT_SUCCESS;
+    result = cy_mqtt_register_event_callback(mqtthandle,
+                (cy_mqtt_callback_t)mqtt_event_cb, NULL);
+
+    return result;
 }
 
 /******************************************************************************
@@ -1596,7 +1601,6 @@ void Azure_hub_pnp_app(void *arg)
     cy_rslt_t TestRes = TEST_PASS ;
     uint8_t Failcount = 0, Passcount = 0;
     uint32_t time_ms = 0;
-    cy_log_init(CY_LOG_ERR, NULL, NULL);
     pnp_msg_event_t *msg_event = NULL;
 #ifdef CY_TFM_PSA_SUPPORTED
     psa_status_t uxStatus = PSA_SUCCESS;
@@ -1604,8 +1608,6 @@ void Azure_hub_pnp_app(void *arg)
     (void)uxStatus;
     (void)read_len;
 #endif
-
-    cy_log_init( CY_LOG_ERR, NULL, NULL );
 
     /* Initialize the queue for hub methods events. */
     pnp_msg_event_queue = xQueueCreate( PNP_MSG_EVENT_QUEUE_LENGTH, sizeof( unsigned long ) );

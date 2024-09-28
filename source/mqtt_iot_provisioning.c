@@ -90,6 +90,9 @@
 
 #define DPS_OPERATION_QUERY_EVENT_QUEUE_LENGTH      (10)
 
+/*String that describes the MQTT handle that is being created in order to uniquely identify it*/
+#define MQTT_HANDLE_DESCRIPTOR                      "MQTThandleID"
+
 /***********************************************************
  * Static Variables
  ************************************************************/
@@ -205,10 +208,10 @@ static cy_rslt_t handle_device_registration_status_message(az_iot_provisioning_c
     {
         IOT_SAMPLE_LOG( "Operation is still pending." );
 
-        TEST_INFO(( "Pushing to dps operation query queue....\n" ));
+        TEST_INFO(( "Pushing to DPS operation query queue....\n" ));
         if( xQueueSend( dps_operation_query_event_queue, (void *)&register_response, pdMS_TO_TICKS(DPS_OPERATION_EVENT_QUEUE_MSEC) ) != pdPASS )
         {
-            TEST_INFO(( "Pushing to dps operation query queue failed\n"));
+            TEST_INFO(( "Pushing to DPS operation query queue failed\n"));
         }
     }
     else /* Operation is complete. */
@@ -658,8 +661,7 @@ static cy_rslt_t create_and_configure_mqtt_client(void)
 
     result = cy_mqtt_create( buffer, NETWORK_BUFFER_SIZE,
             security, &broker_info,
-            (cy_mqtt_callback_t)mqtt_event_cb, NULL,
-            &mqtthandle );
+            MQTT_HANDLE_DESCRIPTOR, &mqtthandle );
     if( result == TEST_PASS )
     {
         TEST_INFO(( "\r\ncy_mqtt_create ----------------------------- Pass \n" ));
@@ -670,7 +672,10 @@ static cy_rslt_t create_and_configure_mqtt_client(void)
         return TEST_FAIL;
     }
 
-    return CY_RSLT_SUCCESS;
+    result = cy_mqtt_register_event_callback(mqtthandle,
+    (cy_mqtt_callback_t)mqtt_event_cb, NULL);
+
+    return result;
 }
 
 /******************************************************************************
@@ -738,7 +743,7 @@ void Azure_dps_app_task(void *arg)
 #endif
 
     /* Initialize the queue for hub method events */
-    dps_operation_query_event_queue = xQueueCreate( DPS_OPERATION_QUERY_EVENT_QUEUE_LENGTH, sizeof( az_iot_provisioning_client_register_response *) );
+    dps_operation_query_event_queue = xQueueCreate( DPS_OPERATION_QUERY_EVENT_QUEUE_LENGTH, sizeof( az_iot_provisioning_client_register_response ) );
     if(dps_operation_query_event_queue != NULL)
     {
         TEST_INFO(( "dps_operation_query_event_queue create ----------- Pass \n" ));
@@ -870,7 +875,7 @@ void Azure_dps_app_task(void *arg)
     {
         if(xQueueReceive( dps_operation_query_event_queue, (void *)&register_response, pdMS_TO_TICKS(GET_QUEUE_TIMEOUT_MSEC) ) != pdPASS)
         {
-            TEST_INFO(( "xQueueReceive failed for pnp_msg_event_queue\n"));
+            /* No need to do anything */
         }
         else
         {
